@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, TextField, Container, Grid, Typography, Box, CircularProgress } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import Register from './Register';
 
 function Login() {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
@@ -86,7 +87,7 @@ function Login() {
           </Grid>
         </form>
         <Typography variant="body2" sx={{ marginTop: 2 }}>
-          Don't have an account? <a href="../Register">Register here</a>
+          Don't have an account?<Link to="/Register"> Register</Link>
         </Typography>
       </Box>
     </Container>
