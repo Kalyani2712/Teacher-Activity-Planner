@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Button, TextField, Container, Grid, Typography, Box, CircularProgress } from '@mui/material';
-import { useNavigate, Link } from 'react-router-dom';
-import Register from './Register';
+import { useNavigate, Link, redirect, redirectDocument } from 'react-router-dom';
+import App from '../App';
 
-function Login() {
+function Login({isLoggedIn, setIsLoggedIn}) {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  var log = false;
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    {/*const isLoggedIn = localStorage.getItem('isLoggedIn');*/}
     if (isLoggedIn) {
+      setIsLoggedIn(true);
       navigate('/dashboard');
     }
   }, [navigate]);
@@ -33,19 +35,19 @@ function Login() {
     }
 
     // Simulate API request
-    setTimeout(() => {
-      const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
-      const user = registeredUsers.find((user) => user.email === credentials.email && user.password === credentials.password);
+    
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    const user = registeredUsers.find((o) => o.user.email === credentials.email && o.user.password === credentials.password);
 
-      if (user) {
-        localStorage.setItem('isLoggedIn', true);
-        setLoading(false);
-        navigate('/dashboard'); // Redirect to dashboard
-      } else {
-        setError('Invalid email or password');
-        setLoading(false);
-      }
-    }, 1000);
+    if (user) {
+      localStorage.setItem('registeredUsers', JSON.stringify([{user: { email: 'admin', password: 'admin' }, 'isLoggedIn': true}]));
+      setLoading(false);
+      window.location.reload();
+      
+    } else {
+      setError('Invalid email or password');
+      setLoading(false);
+    }
   };
 
   return (

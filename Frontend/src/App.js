@@ -51,13 +51,16 @@ function App() {
   // State to handle if user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  //localStorage.setItem('registeredUsers', JSON.stringify([{user: { email: 'admin', password: 'admin' }, 'isLoggedIn': false}]));
+
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers'));
+    setIsLoggedIn(registeredUsers.find(o => o.isLoggedIn === true) ? true : false);
     if (isLoggedIn) {
       setIsLoggedIn(true);
     }
   }, []);
-
+  console.log(isLoggedIn);
   const handleSaveTeachingPlan = (newData) => {
     if (newData.id) {
       setTeachingPlanData(teachingPlanData.map((item) => (item.id === newData.id ? newData : item)));
@@ -212,8 +215,8 @@ function App() {
         </>
       ) : (
         <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/Register" element={<Register />} />
+          <Route path="/" element={<Login /> } />
+          <Route path="/Register" element={<Register isLoggedIn = {isLoggedIn} setIsLoggedIn = {setIsLoggedIn} />} />
         </Routes>
       )}
     </Router>
