@@ -136,21 +136,21 @@ function Sidebar() {
           {open && <ListItemText primary="Syllabus Completion" />}
         </ListItem>
 
-        <ListItem button component={Link} to="/activity-reports-view">
+        <ListItem button component={Link} to="/ActivityReportsView">
           <ListItemIcon>
             <LibraryBooks sx={{ color: '#009688' }} />
           </ListItemIcon>
           {open && <ListItemText primary="Activity Reports" />}
         </ListItem>
 
-        <ListItem button component={Link} to="/course-outcome-view">
+        <ListItem button component={Link} to="/CourseOutcomeView">
           <ListItemIcon>
             <LibraryBooks sx={{ color: '#9e9e9e' }} />
           </ListItemIcon>
           {open && <ListItemText primary="Course Outcome" />}
         </ListItem>
 
-        <ListItem button component={Link} to="/central-assessment-view">
+        <ListItem button component={Link} to="/CentralAssessmentView">
           <ListItemIcon>
             <LibraryBooks sx={{ color: '#e91e63' }} />
           </ListItemIcon>
@@ -158,7 +158,7 @@ function Sidebar() {
         </ListItem>
 
         {/* Logout Button */}
-        <ListItem button component={Link} to="/login">
+        <ListItem button component={Link} to="/Login">
           <ListItemIcon>
             <ExitToApp sx={{ color: '#333' }} />
           </ListItemIcon>

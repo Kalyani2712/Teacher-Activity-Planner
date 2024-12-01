@@ -1,103 +1,125 @@
 import React, { useState } from 'react';
-import { Button, TextField, Container, Grid, Typography, Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import {
+  Box,
+  Grid,
+  TextField,
+  Button,
+  Typography,
+  Container,
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 function ActivityReports() {
-  const [activityData, setActivityData] = useState({
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
     activityType: '',
-    description: '',
+    title: '',
+    objectives: '',
+    studentsAttended: '',
     date: '',
-    className: '',
-    remarks: ''
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setActivityData({ ...activityData, [name]: value });
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Activity Report:', activityData);
+    navigate('/ActivityReportsView', { state: { formData } });
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          Activity Reports
-        </Typography>
-        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Activity Type</InputLabel>
-                <Select
-                  name="activityType"
-                  value={activityData.activityType}
-                  onChange={handleChange}
-                  label="Activity Type"
-                >
-                  <MenuItem value="Practical">Practical</MenuItem>
-                  <MenuItem value="Demo">Demo</MenuItem>
-                  <MenuItem value="Group Activity">Group Activity</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Description"
-                variant="outlined"
-                name="description"
-                value={activityData.description}
-                onChange={handleChange}
-                multiline
-                rows={4}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Date"
-                variant="outlined"
-                name="date"
-                type="date"
-                value={activityData.date}
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Class"
-                variant="outlined"
-                name="className"
-                value={activityData.className}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Remarks"
-                variant="outlined"
-                name="remarks"
-                value={activityData.remarks}
-                onChange={handleChange}
-                multiline
-                rows={4}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" color="primary" type="submit" fullWidth>
-                Save Activity Report
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      {/* Header Section */}
+      <Box
+        sx={{
+          padding: 2,
+          backgroundColor: 'primary.main',
+          color: 'white',
+          textAlign: 'center',
+        }}
+      >
+        <Typography variant="h5">Activity Reports</Typography>
       </Box>
-    </Container>
+
+      {/* Form Section */}
+      <Container sx={{ flexGrow: 1, paddingY: 4 }}>
+        <Box
+          sx={{
+            padding: 3,
+            backgroundColor: 'background.paper',
+            boxShadow: 2,
+            borderRadius: 2,
+          }}
+        >
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Activity Type"
+                  name="activityType"
+                  value={formData.activityType}
+                  onChange={handleChange}
+                  variant="outlined"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  variant="outlined"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Objectives"
+                  name="objectives"
+                  value={formData.objectives}
+                  onChange={handleChange}
+                  multiline
+                  rows={3}
+                  variant="outlined"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="No. of Students Attended"
+                  name="studentsAttended"
+                  value={formData.studentsAttended}
+                  onChange={handleChange}
+                  type="number"
+                  variant="outlined"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Date"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                  type="date"
+                  InputLabelProps={{ shrink: true }}
+                  variant="outlined"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Button variant="contained" color="primary" type="submit">
+                  Save Activity Report
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </Box>
+      </Container>
+    </Box>
   );
 }
 

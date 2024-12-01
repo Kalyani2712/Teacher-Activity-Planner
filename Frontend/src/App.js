@@ -21,8 +21,11 @@ import TeachingPlan from './pages/TeachingPlan'; // Teaching Plan Entry Page
 import TeachingPlanView from './pages/TeachingPlanView'; // Teaching Plan View Page
 import SyllabusCompletionView from './pages/SyllabusCompletionView';
 import SyllabusReport  from './pages/SyllabusReport';
+import ActivityReports from './pages/ActivityReports'; 
 import ActivityReportsView from './pages/ActivityReportsView';
+import CourseOutcome from './pages/CourseOutcome';
 import CourseOutcomeView from './pages/CourseOutcomeView';
+import CentralAssessment from './pages/CentralAssessment';
 import CentralAssessmentView from './pages/CentralAssessmentView';
 import './App.css';
 import PublicationsEntry from './pages/Publications';
@@ -209,9 +212,11 @@ function App() {
               />
               <Route path="/SyllabusCompletionView" element={<SyllabusCompletionView />} />
               <Route path="/SyllabusReport" element={<SyllabusReport />} />
-
+              <Route path="/ActivityReports" element={<ActivityReports />} />
               <Route path="/ActivityReportsView" element={<ActivityReportsView />} />
+              <Route path="/CourseOutcome" element={<CourseOutcome />} />
               <Route path="/CourseOutcomeView" element={<CourseOutcomeView />} />
+              <Route path="/CentralAssessment" element={<CentralAssessment />} />
               <Route path="/CentralAssessmentView" element={<CentralAssessmentView />} />
             </Routes>
           </div> 
