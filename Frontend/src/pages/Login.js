@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, TextField, Container, Grid, Typography, Box, CircularProgress } from '@mui/material';
 import { useNavigate, Link, redirect, redirectDocument } from 'react-router-dom';
-import App from '../App';
+import axios from 'axios';
 
 function Login({isLoggedIn, setIsLoggedIn}) {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
@@ -33,21 +33,33 @@ function Login({isLoggedIn, setIsLoggedIn}) {
       setLoading(false);
       return;
     }
-
-    // Simulate API request
     
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
-    const user = registeredUsers.find((o) => o.user.email === credentials.email && o.user.password === credentials.password);
+    //const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    //const user = registeredUsers.find((o) => o.user.email === credentials.email && o.user.password === credentials.password);
 
-    if (user) {
-      localStorage.setItem('registeredUsers', JSON.stringify([{user: { email: 'admin', password: 'admin' }, 'isLoggedIn': true}]));
-      setLoading(false);
-      window.location.reload();
-      
-    } else {
+    const data = {
+      email: credentials.email,
+      password: credentials.password
+    }
+
+    axios.post('http://localhost:5000/auth', data).then(res => {
+      console.log(res);
+      localStorage.setItem('id', res.data);
+      window.location.href = '/dashboard';
+    }).catch(error => {
+      console.log(error, credentials.email, credentials.password);
       setError('Invalid email or password');
       setLoading(false);
-    }
+    });
+    // if (user) {
+    //   localStorage.setItem('registeredUsers', JSON.stringify([{user: { email: 'admin', password: 'admin' }, 'isLoggedIn': true}]));
+    //   setLoading(false);
+    //   window.location.reload();
+      
+    // } else {
+    //   setError('Invalid email or password');
+    //   setLoading(false);
+    // }
   };
 
   return (

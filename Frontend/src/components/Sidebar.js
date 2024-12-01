@@ -11,6 +11,11 @@ function Sidebar() {
   // Toggle the sidebar
   const handleSidebarToggle = () => setOpen(!open);
 
+  const logout = () => {
+    localStorage.removeItem('id');
+    window.location.href = '/';
+  }
+
   return (
     <Drawer
       sx={{
@@ -158,7 +163,7 @@ function Sidebar() {
         </ListItem>
 
         {/* Logout Button */}
-        <ListItem button component={Link} to="/Login">
+        <ListItem button onClick={logout} component={Link} to="/logout">
           <ListItemIcon>
             <ExitToApp sx={{ color: '#333' }} />
           </ListItemIcon>

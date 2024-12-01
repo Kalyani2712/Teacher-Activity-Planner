@@ -58,11 +58,8 @@ function App() {
  //localStorage.setItem('registeredUsers', JSON.stringify([{user: { email: 'admin', password: 'admin' }, 'isLoggedIn': false}]));
 
   useEffect(() => {
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers'));
-    setIsLoggedIn(registeredUsers.find(o => o.isLoggedIn === true) ? true : false);
-    if (isLoggedIn) {
-      setIsLoggedIn(true);
-    }
+    const id = localStorage.getItem('id') ? true : false;
+    setIsLoggedIn(id);
   }, []);
   console.log(isLoggedIn);
   const handleSaveTeachingPlan = (newData) => {
