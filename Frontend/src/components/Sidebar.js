@@ -129,7 +129,7 @@ function Sidebar() {
           {open && <ListItemText primary="Teaching Plan" />}
         </ListItem>
 
-        <ListItem button component={Link} to="/syllabus-completion-view">
+        <ListItem button component={Link} to="/SyllabusCompletionView">
           <ListItemIcon>
             <LibraryBooks sx={{ color: '#ff9800' }} />
           </ListItemIcon>

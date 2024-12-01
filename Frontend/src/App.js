@@ -20,6 +20,7 @@ import MOOCsView from './pages/MOOCsView'; // Import the MOOCs View
 import TeachingPlan from './pages/TeachingPlan'; // Teaching Plan Entry Page
 import TeachingPlanView from './pages/TeachingPlanView'; // Teaching Plan View Page
 import SyllabusCompletionView from './pages/SyllabusCompletionView';
+import SyllabusReport  from './pages/SyllabusReport';
 import ActivityReportsView from './pages/ActivityReportsView';
 import CourseOutcomeView from './pages/CourseOutcomeView';
 import CentralAssessmentView from './pages/CentralAssessmentView';
@@ -51,7 +52,7 @@ function App() {
   // State to handle if user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  //localStorage.setItem('registeredUsers', JSON.stringify([{user: { email: 'admin', password: 'admin' }, 'isLoggedIn': false}]));
+ //localStorage.setItem('registeredUsers', JSON.stringify([{user: { email: 'admin', password: 'admin' }, 'isLoggedIn': false}]));
 
   useEffect(() => {
     const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers'));
@@ -207,11 +208,13 @@ function App() {
                 }
               />
               <Route path="/SyllabusCompletionView" element={<SyllabusCompletionView />} />
+              <Route path="/SyllabusReport" element={<SyllabusReport />} />
+
               <Route path="/ActivityReportsView" element={<ActivityReportsView />} />
               <Route path="/CourseOutcomeView" element={<CourseOutcomeView />} />
               <Route path="/CentralAssessmentView" element={<CentralAssessmentView />} />
             </Routes>
-          </div>
+          </div> 
         </>
       ) : (
         <Routes>
@@ -219,8 +222,8 @@ function App() {
           <Route path="/Register" element={<Register isLoggedIn = {isLoggedIn} setIsLoggedIn = {setIsLoggedIn} />} />
         </Routes>
       )}
-    </Router>
+    </Router> 
   );
-}
+} 
 
 export default App;

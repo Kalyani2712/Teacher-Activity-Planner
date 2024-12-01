@@ -1,20 +1,45 @@
-import React, { useState } from 'react';
-import { Container, Typography, Box, Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Button } from '@mui/material';
-import { Edit, Delete } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import {
+  Container,
+  Typography,
+  Box,
+  Paper,
+  TextField,
+  Button,
+  Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from '@mui/material';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function SyllabusCompletionPage() {
-  const [syllabusData, setSyllabusData] = useState([]);
   const [formData, setFormData] = useState({
     className: '',
-    subject: '',
-    totalTopics: '',
-    completedTopics: '',
-    remainingTopics: '',
-    status: ''
+    semester: '',
+    paperNo: '',
+    paperTitle: '',
+    month: '',
+    syllabusPlanned: '',
+    syllabusRemained: '',
+    remark: '',
   });
 
   const navigate = useNavigate();
+  const { state } = useLocation();
+
+  useEffect(() => {
+    if (state?.formData) {
+      setFormData(state.formData); // Pre-fill form if editing
+    }
+  }, [state]);
+
+  const classOptions = ['FY', 'SY', 'TY', 'MSc-1', 'MSc-2'];
+  const semesterOptions = ['1', '2', '3', '4', '5', '6'];
+  const monthOptions = [
+    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December',
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,159 +48,121 @@ function SyllabusCompletionPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setSyllabusData([...syllabusData, { ...formData, id: Date.now() }]);
-    setFormData({
-      className: '',
-      subject: '',
-      totalTopics: '',
-      completedTopics: '',
-      remainingTopics: '',
-      status: ''
-    });
-  };
-
-  const handleEdit = (id) => {
-    const item = syllabusData.find((entry) => entry.id === id);
-    setFormData(item);
-    setSyllabusData(syllabusData.filter((entry) => entry.id !== id));
-  };
-
-  const handleDelete = (id) => {
-    setSyllabusData(syllabusData.filter((entry) => entry.id !== id));
+    // For the sake of this example, we save the form data in state and navigate to the view page
+    navigate('/SyllabusCompletionView', { state: { formData } });
   };
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="xl">
       <Box sx={{ padding: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          Syllabus Completion Record
+        <Typography variant="h4" gutterBottom>
+          Syllabus Completion Form
         </Typography>
 
-        <form onSubmit={handleSubmit}>
-          <Paper sx={{ padding: 2, marginBottom: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Enter Syllabus Completion Details
-            </Typography>
-            <TableContainer component={Paper} sx={{ marginBottom: 2 }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Class</TableCell>
-                    <TableCell>Subject</TableCell>
-                    <TableCell>Total Topics</TableCell>
-                    <TableCell>Completed Topics</TableCell>
-                    <TableCell>Remaining Topics</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>
-                      <input
-                        type="text"
-                        name="className"
-                        value={formData.className}
-                        onChange={handleChange}
-                        placeholder="Enter Class"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <input
-                        type="text"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        placeholder="Enter Subject"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <input
-                        type="number"
-                        name="totalTopics"
-                        value={formData.totalTopics}
-                        onChange={handleChange}
-                        placeholder="Total Topics"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <input
-                        type="number"
-                        name="completedTopics"
-                        value={formData.completedTopics}
-                        onChange={handleChange}
-                        placeholder="Completed Topics"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <input
-                        type="number"
-                        name="remainingTopics"
-                        value={formData.remainingTopics}
-                        onChange={handleChange}
-                        placeholder="Remaining Topics"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <input
-                        type="text"
-                        name="status"
-                        value={formData.status}
-                        onChange={handleChange}
-                        placeholder="Status"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="contained" color="primary" type="submit">
-                        Add Record
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
-        </form>
+        <Paper sx={{ padding: 3 }}>
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6} md={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Class</InputLabel>
+                  <Select
+                    name="className"
+                    value={formData.className}
+                    onChange={handleChange}
+                  >
+                    {classOptions.map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Semester</InputLabel>
+                  <Select
+                    name="semester"
+                    value={formData.semester}
+                    onChange={handleChange}
+                  >
+                    {semesterOptions.map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <TextField
+                  fullWidth
+                  label="Paper No"
+                  name="paperNo"
+                  value={formData.paperNo}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <TextField
+                  fullWidth
+                  label="Paper Title"
+                  name="paperTitle"
+                  value={formData.paperTitle}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Month</InputLabel>
+                  <Select
+                    name="month"
+                    value={formData.month}
+                    onChange={handleChange}
+                  >
+                    {monthOptions.map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <TextField
+                  fullWidth
+                  label="Planned Syllabus"
+                  name="syllabusPlanned"
+                  value={formData.syllabusPlanned}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <TextField
+                  fullWidth
+                  label="Remaining Syllabus"
+                  name="syllabusRemained"
+                  value={formData.syllabusRemained}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <TextField
+                  fullWidth
+                  label="Remark"
+                  name="remark"
+                  value={formData.remark}
+                  onChange={handleChange}
+                />
+              </Grid>
+            </Grid>
 
-        <Paper sx={{ padding: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Syllabus Completion Records
-          </Typography>
-          <TableContainer component={Paper} sx={{ marginTop: 2 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Class</TableCell>
-                  <TableCell>Subject</TableCell>
-                  <TableCell>Total Topics</TableCell>
-                  <TableCell>Completed Topics</TableCell>
-                  <TableCell>Remaining Topics</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {syllabusData.map((entry) => (
-                  <TableRow key={entry.id}>
-                    <TableCell>{entry.className}</TableCell>
-                    <TableCell>{entry.subject}</TableCell>
-                    <TableCell>{entry.totalTopics}</TableCell>
-                    <TableCell>{entry.completedTopics}</TableCell>
-                    <TableCell>{entry.remainingTopics}</TableCell>
-                    <TableCell>{entry.status}</TableCell>
-                    <TableCell>
-                      <IconButton onClick={() => handleEdit(entry.id)}>
-                        <Edit />
-                      </IconButton>
-                      <IconButton onClick={() => handleDelete(entry.id)}>
-                        <Delete />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+            <Box sx={{ marginTop: 3 }}>
+              <Button variant="contained" color="primary" type="submit" fullWidth>
+                Save Record
+              </Button>
+            </Box>
+          </form>
         </Paper>
       </Box>
     </Container>
