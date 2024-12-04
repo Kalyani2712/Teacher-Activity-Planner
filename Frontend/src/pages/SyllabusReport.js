@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   Container,
-  Typography,
   Box,
+  Typography,
   Paper,
   TextField,
   Button,
@@ -11,6 +11,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Divider,
 } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -53,17 +54,38 @@ function SyllabusCompletionPage() {
   };
 
   return (
-    <Container maxWidth="xl">
-      <Box sx={{ padding: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          Syllabus Completion Form
-        </Typography>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(to right, #2c3e50, #3498db)', // Gradient background
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 4,
+      }}
+    >
+      <Container maxWidth="sm">
+        <Box
+          sx={{
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            padding: 4,
+          }}
+        >
+          <Typography
+            variant="h5"
+            gutterBottom
+            sx={{ textAlign: 'center', fontWeight: 'bold', color: '#333' }}
+          >
+            Syllabus Completion Form
+          </Typography>
 
-        <Paper sx={{ padding: 3 }}>
           <form onSubmit={handleSubmit}>
+            {/* General Information Section */}
             <Grid container spacing={3}>
-              <Grid item xs={12} sm={6} md={4}>
-                <FormControl fullWidth>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}>
                   <InputLabel>Class</InputLabel>
                   <Select
                     name="className"
@@ -78,8 +100,9 @@ function SyllabusCompletionPage() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <FormControl fullWidth>
+
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}>
                   <InputLabel>Semester</InputLabel>
                   <Select
                     name="semester"
@@ -94,26 +117,31 @@ function SyllabusCompletionPage() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6} md={4}>
+
+              <Grid item xs={12}>
                 <TextField
                   fullWidth
                   label="Paper No"
                   name="paperNo"
                   value={formData.paperNo}
                   onChange={handleChange}
+                  sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6} md={4}>
+
+              <Grid item xs={12}>
                 <TextField
                   fullWidth
                   label="Paper Title"
                   name="paperTitle"
                   value={formData.paperTitle}
                   onChange={handleChange}
+                  sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <FormControl fullWidth>
+
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}>
                   <InputLabel>Month</InputLabel>
                   <Select
                     name="month"
@@ -128,44 +156,62 @@ function SyllabusCompletionPage() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6} md={4}>
+
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="Planned Syllabus"
                   name="syllabusPlanned"
                   value={formData.syllabusPlanned}
                   onChange={handleChange}
+                  sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6} md={4}>
+
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="Remaining Syllabus"
                   name="syllabusRemained"
                   value={formData.syllabusRemained}
                   onChange={handleChange}
+                  sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6} md={4}>
+
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="Remark"
                   name="remark"
                   value={formData.remark}
                   onChange={handleChange}
+                  sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
                 />
               </Grid>
             </Grid>
 
-            <Box sx={{ marginTop: 3 }}>
-              <Button variant="contained" color="primary" type="submit" fullWidth>
+            <Divider sx={{ marginTop: 4, marginBottom: 2 }} />
+
+            <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 4 }}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                sx={{
+                  padding: '10px 20px',
+                  fontSize: '16px',
+                  borderRadius: '5px',
+                  fontWeight: 'bold',
+                }}
+              >
                 Save Record
               </Button>
             </Box>
           </form>
-        </Paper>
-      </Box>
-    </Container>
+        </Box>
+      </Container>
+    </Box>
   );
 }
 

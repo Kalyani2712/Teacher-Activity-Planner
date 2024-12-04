@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
+import Profile  from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import Register from './pages/Register';
 import AssignedLecturesView from './pages/AssignedLecturesView';
@@ -156,7 +157,7 @@ function App() {
           <div style={{ marginLeft: 240, paddingTop: 64 }}> {/* Adjust the marginLeft based on sidebar width */}
             <Routes>
               <Route path="/dashboard" element={<Dashboard />} />
-              
+              <Route path="/Profile" element={<Profile/>} />
               {/* Assigned Lectures */}
               <Route path="/assigned-lectures-view" element={<AssignedLecturesView />} />
               <Route path="/assigned-lectures" element={<AssignedLectures />} />
@@ -222,6 +223,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Login /> } />
           <Route path="/Register" element={<Register isLoggedIn = {isLoggedIn} setIsLoggedIn = {setIsLoggedIn} />} />
+         
         </Routes>
       )}
     </Router> 

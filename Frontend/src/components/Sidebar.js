@@ -77,7 +77,26 @@ function Sidebar() {
           </ListItemIcon>
           {open && <ListItemText primary="Assigned Lectures" />}
         </ListItem>
+        <ListItem button component={Link} to="/TeachingPlanView">
+          <ListItemIcon>
+            <LibraryBooks sx={{ color: '#8bc34a' }} />
+          </ListItemIcon>
+          {open && <ListItemText primary="Teaching Plan" />}
+        </ListItem>
 
+        <ListItem button component={Link} to="/SyllabusCompletionView">
+          <ListItemIcon>
+            <LibraryBooks sx={{ color: '#ff9800' }} />
+          </ListItemIcon>
+          {open && <ListItemText primary="Syllabus Completion" />}
+        </ListItem>
+
+        <ListItem button component={Link} to="/ActivityReportsView">
+          <ListItemIcon>
+            <LibraryBooks sx={{ color: '#009688' }} />
+          </ListItemIcon>
+          {open && <ListItemText primary="Activity Reports" />}
+        </ListItem>
         <ListItem button component={Link} to="/leave-records-view">
           <ListItemIcon>
             <LibraryBooks sx={{ color: '#4caf50' }} />
@@ -126,28 +145,7 @@ function Sidebar() {
           </ListItemIcon>
           {open && <ListItemText primary="MOOCs & E-content" />}
         </ListItem>
-
-        <ListItem button component={Link} to="/TeachingPlanView">
-          <ListItemIcon>
-            <LibraryBooks sx={{ color: '#8bc34a' }} />
-          </ListItemIcon>
-          {open && <ListItemText primary="Teaching Plan" />}
-        </ListItem>
-
-        <ListItem button component={Link} to="/SyllabusCompletionView">
-          <ListItemIcon>
-            <LibraryBooks sx={{ color: '#ff9800' }} />
-          </ListItemIcon>
-          {open && <ListItemText primary="Syllabus Completion" />}
-        </ListItem>
-
-        <ListItem button component={Link} to="/ActivityReportsView">
-          <ListItemIcon>
-            <LibraryBooks sx={{ color: '#009688' }} />
-          </ListItemIcon>
-          {open && <ListItemText primary="Activity Reports" />}
-        </ListItem>
-
+       
         <ListItem button component={Link} to="/CourseOutcomeView">
           <ListItemIcon>
             <LibraryBooks sx={{ color: '#9e9e9e' }} />

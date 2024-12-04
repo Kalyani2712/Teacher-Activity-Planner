@@ -4,7 +4,6 @@ import {
   Typography,
   Box,
   Paper,
-  TextField,
   TableContainer,
   Table,
   TableHead,
@@ -14,71 +13,53 @@ import {
   IconButton,
   Button,
   Stack,
+  TextField,
+  InputAdornment,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
 } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { CSVLink } from 'react-csv';
 import { useReactToPrint } from 'react-to-print';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify'; // Notification for success
 
 const headers = [
-  { label: 'Class', key: 'className' },
+  { label: 'Class Name', key: 'className' },
   { label: 'Semester', key: 'semester' },
   { label: 'Paper No', key: 'paperNo' },
   { label: 'Paper Title', key: 'paperTitle' },
   { label: 'Month', key: 'month' },
-  { label: 'Planned', key: 'syllabusPlanned' },
-  { label: 'Remaining', key: 'syllabusRemained' },
+  { label: 'Syllabus Planned', key: 'syllabusPlanned' },
+  { label: 'Syllabus Remained', key: 'syllabusRemained' },
   { label: 'Remark', key: 'remark' },
 ];
 
-function SyllabusCompletionView() {
-  const { state } = useLocation();
-  const navigate = useNavigate();
+function SyllabusCompletionView({ data = [], onDelete, onEdit }) {
   const printRef = useRef();
+  const navigate = useNavigate();
+
+  // States for sorting, search, and filtered data
+  const [sortedData, setSortedData] = useState(data);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
 
-  const [filteredData, setFilteredData] = useState(
-    state?.formData ? [{ ...state.formData, id: Math.random() }] : []
-  );
-
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value.toLowerCase());
-  };
-
-  const dataToDisplay = filteredData.filter((entry) =>
-    Object.values(entry).some((val) =>
-      val?.toString().toLowerCase().includes(searchTerm)
-    )
-  );
-
+  // Print functionality
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
   });
 
+  // Export to PDF
   const handleExportPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [
-        [
-          'Class',
-          'Semester',
-          'Paper No',
-          'Paper Title',
-          'Month',
-          'Planned',
-          'Remaining',
-          'Remark',
-        ],
-      ],
-      body: dataToDisplay.map((item) => [
+      head: [['Class Name', 'Semester', 'Paper No', 'Paper Title', 'Month', 'Syllabus Planned', 'Syllabus Remained', 'Remark']],
+      body: sortedData.map((item) => [
         item.className,
         item.semester,
         item.paperNo,
@@ -90,230 +71,242 @@ function SyllabusCompletionView() {
       ]),
       styles: { halign: 'center' },
     });
-    doc.save('syllabus_data.pdf');
+    doc.save('syllabus_records_data.pdf');
   };
 
+  // Edit button click handler (from table)
+  const handleEdit = (entry) => {
+    onEdit(entry); // Pass data to parent component for editing
+    navigate('/SyllabusReport'); // Navigate to the edit page
+  };
+
+  // Search filter handler
+  const handleSearchChange = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchTerm(query);
+    setSortedData(
+      data.filter(
+        (item) =>
+          item.className.toLowerCase().includes(query) ||
+          item.paperTitle.toLowerCase().includes(query)
+      )
+    );
+  };
+
+  // Sorting functionality (by Class Name)
   const handleSortChange = (e) => {
     const order = e.target.value;
     setSortOrder(order);
-    const sorted = [...dataToDisplay].sort((a, b) => {
+    const sorted = [...sortedData].sort((a, b) => {
       if (order === 'asc') {
         return a.className.localeCompare(b.className);
       } else {
         return b.className.localeCompare(a.className);
       }
     });
-    setFilteredData(sorted);
+    setSortedData(sorted);
   };
 
-  const handleEdit = (entry) => {
-    navigate('/SyllabusReport', { state: { formData: entry } });
-  };
-
+  // Handle delete
   const handleDelete = (id) => {
-    const updatedData = filteredData.filter((entry) => entry.id !== id);
-    setFilteredData(updatedData);
-    toast.success('Record deleted successfully!');
+    onDelete(id); // Delete record from parent component
+    toast.success('Record deleted successfully!'); // Notify success
+  };
+
+  // Navigate to Add/Edit page
+  const handleAddOrEditClick = () => {
+    navigate('/SyllabusReport'); // Navigate to the add/edit page for a new entry
   };
 
   return (
-    <Container maxWidth="xl">
-      <Box
-        sx={{
-          padding: 4,
-          backgroundColor: 'background.paper',
-          borderRadius: 2,
-          boxShadow: 3,
-        }}
-      >
-        <Typography
-          variant="h4"
-          gutterBottom
-          sx={{ fontWeight: 'bold', color: 'primary.main' }}
-        >
-          Syllabus Completion Records
-        </Typography>
-
-        {/* Search and Add New Record */}
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: '#1D2B64', // Gradient background
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 4,
+      }}
+    >
+      <Container maxWidth="lg">
         <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginBottom: 3,
-            flexWrap: 'wrap',
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            padding: 4,
           }}
         >
-          <TextField
-            label="Search Records"
-            variant="outlined"
-            onChange={handleSearch}
-            fullWidth
-            sx={{ maxWidth: '300px', marginBottom: 2 }}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() =>
-              navigate('/SyllabusReport', { state: { formData: {} } })
-            }
-            sx={{ marginLeft: 2, height: 'fit-content', borderRadius: 2 }}
-          >
-            Add New Record
-          </Button>
-        </Box>
+          <Typography variant="h5" gutterBottom>
+            Syllabus Completion Records View
+          </Typography>
 
-        {/* Sort Dropdown */}
-        <FormControl fullWidth sx={{ marginBottom: 3 }}>
-          <InputLabel>Sort By</InputLabel>
-          <Select
-            value={sortOrder}
-            onChange={handleSortChange}
-            label="Sort By"
-            sx={{ borderRadius: 2 }}
-          >
-            <MenuItem value="asc">Ascending</MenuItem>
-            <MenuItem value="desc">Descending</MenuItem>
-          </Select>
-        </FormControl>
-
-        {/* Table with scroll on smaller screens */}
-        <TableContainer
-          component={Paper}
-          ref={printRef}
-          sx={{
-            maxHeight: '500px',
-            overflow: 'auto',
-            borderRadius: 2,
-          }}
-        >
-          <Table>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: 'primary.main', color: 'white' }}>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>
-                  Class
-                </TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>
-                  Semester
-                </TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>
-                  Paper No
-                </TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>
-                  Paper Title
-                </TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>
-                  Month
-                </TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>
-                  Planned
-                </TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>
-                  Remaining
-                </TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>
-                  Remark
-                </TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {dataToDisplay.length > 0 ? (
-                dataToDisplay.map((entry) => (
-                  <TableRow
-                    key={entry.id}
-                    sx={{ '&:hover': { backgroundColor: '#f5f5f5' } }}
-                  >
-                    <TableCell>{entry.className}</TableCell>
-                    <TableCell>{entry.semester}</TableCell>
-                    <TableCell>{entry.paperNo}</TableCell>
-                    <TableCell>{entry.paperTitle}</TableCell>
-                    <TableCell>{entry.month}</TableCell>
-                    <TableCell>{entry.syllabusPlanned}</TableCell>
-                    <TableCell>{entry.syllabusRemained}</TableCell>
-                    <TableCell>{entry.remark}</TableCell>
-                    <TableCell>
-                      <Stack direction="row" spacing={1}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleEdit(entry)}
-                          sx={{ color: 'primary.main' }}
-                        >
-                          <Edit fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDelete(entry.id)}
-                          sx={{ color: 'error.main' }}
-                        >
-                          <Delete fontSize="small" />
-                        </IconButton>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={9}
-                    align="center"
-                    sx={{ color: 'text.secondary' }}
-                  >
-                    No syllabus records available.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        {/* Export and Print Buttons */}
-        <Box
-          sx={{
-            marginTop: 2,
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Stack direction="row" spacing={2}>
+          {/* Add/Edit Button */}
+          <Box sx={{ marginBottom: 2 }}>
             <Button
-              variant="outlined"
+              variant="contained"
               color="primary"
               size="small"
-              sx={{ borderRadius: 2 }}
+              onClick={handleAddOrEditClick}
+              sx={{ fontWeight: 'bold', borderRadius: '5px' }}
             >
-              <CSVLink
-                data={dataToDisplay}
-                headers={headers}
-                filename="syllabus_data.csv"
-                style={{ textDecoration: 'none', color: 'inherit' }}
+              Add/Edit Syllabus Record
+            </Button>
+          </Box>
+
+          {/* Search Bar */}
+          <TextField
+            label="Search"
+            variant="outlined"
+            fullWidth
+            value={searchTerm}
+            onChange={handleSearchChange}
+            sx={{ marginBottom: 2 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  🔍
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          {/* Sort Dropdown */}
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+            <InputLabel>Sort By</InputLabel>
+            <Select value={sortOrder} onChange={handleSortChange} label="Sort By">
+              <MenuItem value="asc">Ascending</MenuItem>
+              <MenuItem value="desc">Descending</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Data Table */}
+          <TableContainer component={Paper} ref={printRef} sx={{ marginBottom: 2 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Sr. No.</TableCell>
+                  <TableCell>Class Name</TableCell>
+                  <TableCell>Semester</TableCell>
+                  <TableCell>Paper No</TableCell>
+                  <TableCell>Paper Title</TableCell>
+                  <TableCell>Month</TableCell>
+                  <TableCell>Syllabus Planned</TableCell>
+                  <TableCell>Syllabus Remained</TableCell>
+                  <TableCell>Remark</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {sortedData.length > 0 ? (
+                  sortedData.map((entry, index) => (
+                    <TableRow
+                      key={entry.id}
+                      sx={{
+                        '&:nth-of-type(odd)': { backgroundColor: '#f9f9f9' },
+                        '&:hover': { backgroundColor: '#f1f1f1' },
+                      }}
+                    >
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{entry.className}</TableCell>
+                      <TableCell>{entry.semester}</TableCell>
+                      <TableCell>{entry.paperNo}</TableCell>
+                      <TableCell>{entry.paperTitle}</TableCell>
+                      <TableCell>{entry.month}</TableCell>
+                      <TableCell>{entry.syllabusPlanned}</TableCell>
+                      <TableCell>{entry.syllabusRemained}</TableCell>
+                      <TableCell>{entry.remark}</TableCell>
+                      <TableCell>
+                        <Stack direction="row" spacing={1}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEdit(entry)}
+                            sx={{ color: '#1976d2' }}
+                          >
+                            <Edit fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDelete(entry.id)}
+                            sx={{ color: '#d32f2f' }}
+                          >
+                            <Delete fontSize="small" />
+                          </IconButton>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={10} align="center">
+                      No syllabus records available.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          {/* Export Buttons */}
+          <Box sx={{ marginTop: 2 }}>
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                sx={{
+                  '&:hover': { backgroundColor: '#e3f2fd' },
+                  fontWeight: 'bold',
+                  borderRadius: '5px',
+                }}
               >
-                Export to CSV
-              </CSVLink>
-            </Button>
-            <Button
-              variant="outlined"
-              color="secondary"
-              size="small"
-              sx={{ borderRadius: 2 }}
-              onClick={handleExportPDF}
-            >
-              Export to PDF
-            </Button>
-            <Button
-              variant="outlined"
-              size="small"
-              sx={{ borderRadius: 2 }}
-              onClick={handlePrint}
-            >
-              Print
-            </Button>
-          </Stack>
+                <CSVLink data={sortedData} headers={headers} filename="syllabus_records_data.csv">
+                  Export to CSV
+                </CSVLink>
+              </Button>
+              <Button
+                variant="outlined"
+                color="success"
+                size="small"
+                sx={{
+                  '&:hover': { backgroundColor: '#e8f5e9' },
+                  fontWeight: 'bold',
+                  borderRadius: '5px',
+                }}
+                onClick={handleExportPDF}
+              >
+                Export to PDF
+              </Button>
+              <Button
+                variant="outlined"
+                color="success"
+                size="small"
+                sx={{
+                  '&:hover': { backgroundColor: '#e8f5e9' },
+                  fontWeight: 'bold',
+                  borderRadius: '5px',
+                }}
+                onClick={handlePrint}
+              >
+                Print
+              </Button>
+            </Stack>
+          </Box>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 }
+
+SyllabusCompletionView.propTypes = {
+  data: PropTypes.array,
+  onDelete: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
+};
+
+SyllabusCompletionView.defaultProps = {
+  data: [],
+};
 
 export default SyllabusCompletionView;

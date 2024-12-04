@@ -30,7 +30,7 @@ function ActivityReports() {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#1D2B64' }}>
       {/* Header Section */}
       <Box
         sx={{
@@ -48,9 +48,10 @@ function ActivityReports() {
         <Box
           sx={{
             padding: 3,
-            backgroundColor: 'background.paper',
+            backgroundColor: '#ffffff',
             boxShadow: 2,
             borderRadius: 2,
+            // Optional: Add some gradient or pattern to match your 'LeaveRecord' page background
           }}
         >
           <form onSubmit={handleSubmit}>

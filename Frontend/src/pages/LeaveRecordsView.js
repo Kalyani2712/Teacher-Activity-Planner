@@ -116,7 +116,7 @@ function LeaveRecordsView({ data, onDelete, onEdit }) {
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(to right, #6a11cb, #2575fc)', // Gradient background
+        background: '#1D2B64', // Gradient background
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

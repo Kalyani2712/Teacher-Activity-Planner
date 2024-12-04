@@ -1,65 +1,302 @@
-import React from 'react';
-import { Container, Table, TableHead, TableRow, TableCell, TableBody, Box, IconButton, Button, TableContainer, Paper, Typography } from '@mui/material';
+import React, { useState, useRef } from 'react';
+import {
+  Container,
+  Typography,
+  Box,
+  Paper,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  IconButton,
+  Button,
+  Stack,
+  TextField,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
+import { CSVLink } from 'react-csv';
+import { useReactToPrint } from 'react-to-print';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable'; // Required for PDF export
+import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify'; // Notification for success
 
-function TeachingPlanView({ data = [], onDelete, onEdit }) { // Defaulting data to an empty array
-  const history = useNavigate();
+const headers = [
+  { label: 'Year', key: 'year' },
+  { label: 'Class', key: 'class' },
+  { label: 'Course', key: 'course' },
+  { label: 'Topics Allocated', key: 'topicsAllocated' },
+  { label: 'Planned Date', key: 'plannedDate' },
+];
 
-  const handleEdit = (entry) => {
-    onEdit(entry);
-    history('/TeachingPlan');
+function TeachingPlanView({ data, onDelete, onEdit }) {
+  const printRef = useRef();
+  const navigate = useNavigate();
+
+  // States for sorting, search, and filtered data
+  const [sortedData, setSortedData] = useState(data);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('asc');
+
+  // Print functionality
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+  });
+
+  // Export to PDF
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    doc.autoTable({
+      head: [['Year', 'Class', 'Course', 'Topics Allocated', 'Planned Date']],
+      body: sortedData.map((item) => [
+        item.year,
+        item.class,
+        item.course,
+        item.topicsAllocated,
+        item.plannedDate,
+      ]),
+      styles: { halign: 'center' },
+    });
+    doc.save('teaching_plan_data.pdf');
   };
 
-  const handleAdd = () => {
-    history('/TeachingPlan');
+  // Edit button click handler (from table)
+  const handleEdit = (entry) => {
+    onEdit(entry); // Pass data to parent component for editing
+    navigate('/TeachingPlan'); // Navigate to the edit page
+  };
+
+  // Search filter handler
+  const handleSearchChange = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchTerm(query);
+    setSortedData(
+      data.filter(
+        (item) =>
+          item.year.toLowerCase().includes(query) ||
+          item.class.toLowerCase().includes(query) ||
+          item.course.toLowerCase().includes(query)
+      )
+    );
+  };
+
+  // Sorting functionality
+  const handleSortChange = (e) => {
+    const order = e.target.value;
+    setSortOrder(order);
+    const sorted = [...sortedData].sort((a, b) => {
+      if (order === 'asc') {
+        return a.year.localeCompare(b.year);
+      } else {
+        return b.year.localeCompare(a.year);
+      }
+    });
+    setSortedData(sorted);
+  };
+
+  // Handle delete
+  const handleDelete = (id) => {
+    onDelete(id); // Delete record from parent component
+    toast.success('Record deleted successfully!'); // Notify success
+  };
+
+  // Navigate to Add/Edit page
+  const handleAddOrEditClick = () => {
+    navigate('/TeachingPlan'); // Navigate to the add/edit page for a new entry
   };
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ padding: 3, borderRadius: 2, boxShadow: 3 }}>
-        <Typography variant="h5" gutterBottom>Teaching Plan Data View</Typography>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: '#1c1c3c', // Dark Navy Blue background
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 4,
+      }}
+    >
+      <Container maxWidth="lg">
+        <Box
+          sx={{
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            padding: 4,
+          }}
+        >
+          <Typography variant="h5" gutterBottom>
+            Teaching Plan Data View
+          </Typography>
 
-        <Button variant="contained" color="primary" onClick={handleAdd} sx={{ marginBottom: 3 }}>
-          Add New Teaching Plan
-        </Button>
+          {/* Add/Edit Button */}
+          <Box sx={{ marginBottom: 2 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={handleAddOrEditClick}
+              sx={{ fontWeight: 'bold', borderRadius: '5px' }}
+            >
+              Add/Edit Teaching Plan
+            </Button>
+          </Box>
 
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Year</TableCell>
-                <TableCell>Class</TableCell>
-                <TableCell>Course</TableCell>
-                <TableCell>Topics Allocated</TableCell>
-                <TableCell>Planned Date</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {(Array.isArray(data) ? data : []).map((entry) => (
-                <TableRow key={entry.id}>
-                  <TableCell>{entry.year}</TableCell>
-                  <TableCell>{entry.class}</TableCell>
-                  <TableCell>{entry.course}</TableCell>
-                  <TableCell>{entry.topicsAllocated}</TableCell>
-                  <TableCell>{entry.plannedDate}</TableCell>
-                  <TableCell>
-                    <IconButton onClick={() => handleEdit(entry)}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton onClick={() => onDelete(entry.id)}>
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
+          {/* Search Bar */}
+          <TextField
+            label="Search"
+            variant="outlined"
+            fullWidth
+            value={searchTerm}
+            onChange={handleSearchChange}
+            sx={{ marginBottom: 2 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">🔍</InputAdornment>
+              ),
+            }}
+          />
+
+          {/* Sort Dropdown */}
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+            <InputLabel>Sort By Year</InputLabel>
+            <Select value={sortOrder} onChange={handleSortChange} label="Sort By">
+              <MenuItem value="asc">Ascending</MenuItem>
+              <MenuItem value="desc">Descending</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Data Table */}
+          <TableContainer component={Paper} ref={printRef} sx={{ marginBottom: 2 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Year</TableCell>
+                  <TableCell>Class</TableCell>
+                  <TableCell>Course</TableCell>
+                  <TableCell>Topics Allocated</TableCell>
+                  <TableCell>Planned Date</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-    </Container>
+              </TableHead>
+              <TableBody>
+                {sortedData.length > 0 ? (
+                  sortedData.map((entry, index) => (
+                    <TableRow key={entry.id}>
+                      <TableCell>{entry.year}</TableCell>
+                      <TableCell>{entry.class}</TableCell>
+                      <TableCell>{entry.course}</TableCell>
+                      <TableCell>{entry.topicsAllocated}</TableCell>
+                      <TableCell>{entry.plannedDate}</TableCell>
+                      <TableCell>
+                        <Stack direction="row" spacing={1}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEdit(entry)}
+                            sx={{ color: '#1976d2' }}
+                          >
+                            <Edit fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDelete(entry.id)}
+                            sx={{ color: '#d32f2f' }}
+                          >
+                            <Delete fontSize="small" />
+                          </IconButton>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center">
+                      No teaching plans available.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          {/* Export Buttons */}
+          <Box sx={{ marginTop: 2 }}>
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                sx={{
+                  '&:hover': { backgroundColor: '#e3f2fd' },
+                  fontWeight: 'bold',
+                  borderRadius: '5px',
+                }}
+              >
+                <CSVLink
+                  data={sortedData}
+                  headers={headers}
+                  filename="teaching_plan_data.csv"
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  Export to CSV
+                </CSVLink>
+              </Button>
+
+              <Button
+                variant="outlined"
+                color="secondary"
+                size="small"
+                sx={{
+                  '&:hover': { backgroundColor: '#ffebee' },
+                  fontWeight: 'bold',
+                  borderRadius: '5px',
+                }}
+                onClick={handleExportPDF}
+              >
+                Export to PDF
+              </Button>
+
+              <Button
+                variant="outlined"
+                size="small"
+                sx={{
+                  '&:hover': { backgroundColor: '#e3f2fd' },
+                  fontWeight: 'bold',
+                  borderRadius: '5px',
+                }}
+                onClick={handlePrint}
+              >
+                Print
+              </Button>
+            </Stack>
+          </Box>
+        </Box>
+      </Container>
+    </Box>
   );
 }
+
+TeachingPlanView.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      year: PropTypes.string.isRequired,
+      class: PropTypes.string.isRequired,
+      course: PropTypes.string.isRequired,
+      topicsAllocated: PropTypes.string.isRequired,
+      plannedDate: PropTypes.string.isRequired,
+    })
+  ),
+  onDelete: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
+};
 
 export default TeachingPlanView;

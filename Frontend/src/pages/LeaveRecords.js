@@ -47,88 +47,142 @@ const LeaveRecordsEntry = ({ onSave }) => {
   }, [initialData]);
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ padding: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          {initialData ? 'Edit Leave Record' : 'Add Leave Record'}
-        </Typography>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(to right, #1D2B64, #F8CDDA)',
+        padding: 4,
+      }}
+    >
+      <Container maxWidth="sm">
+        <Box
+          sx={{
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)',
+            padding: 4,
+          }}
+        >
+          <Typography
+            variant="h5"
+            sx={{
+              textAlign: 'center',
+              fontWeight: 'bold',
+              color: '#333333',
+              marginBottom: 3,
+            }}
+          >
+            {initialData ? 'Edit Leave Record' : 'Add Leave Record'}
+          </Typography>
 
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Leave Type</InputLabel>
-                <Select
-                  name="leaveType"
-                  value={formData.leaveType}
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <InputLabel>Leave Type</InputLabel>
+                  <Select
+                    name="leaveType"
+                    value={formData.leaveType}
+                    onChange={handleChange}
+                    required
+                  >
+                    <MenuItem value="Casual Leave">Casual Leave</MenuItem>
+                    <MenuItem value="Duty Leave">Duty Leave</MenuItem>
+                    <MenuItem value="Other Leave">Other Leave</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  label="From Date"
+                  type="date"
+                  name="fromDate"
+                  value={formData.fromDate}
                   onChange={handleChange}
+                  fullWidth
                   required
+                  InputLabelProps={{ shrink: true }}
+                  sx={{
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: '5px',
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  label="To Date"
+                  type="date"
+                  name="toDate"
+                  value={formData.toDate}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  InputLabelProps={{ shrink: true }}
+                  sx={{
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: '5px',
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  label="Number of Days"
+                  type="number"
+                  name="numberOfDays"
+                  value={formData.numberOfDays}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  sx={{
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: '5px',
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  label="Reason"
+                  name="reason"
+                  value={formData.reason}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  sx={{
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: '5px',
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  type="submit"
+                  fullWidth
+                  sx={{
+                    padding: '12px 0',
+                    fontWeight: 'bold',
+                    borderRadius: '8px',
+                    backgroundColor: '#333333',
+                    '&:hover': { backgroundColor: '#555555' },
+                  }}
                 >
-                  <MenuItem value="Casual Leave">Casual Leave</MenuItem>
-                  <MenuItem value="Duty Leave">Duty Leave</MenuItem>
-                  <MenuItem value="Other Leave">Other Leave</MenuItem>
-                </Select>
-              </FormControl>
+                  {initialData ? 'Update Record' : 'Save Record'}
+                </Button>
+              </Grid>
             </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                label="From Date"
-                type="date"
-                name="fromDate"
-                value={formData.fromDate}
-                onChange={handleChange}
-                fullWidth
-                required
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                label="To Date"
-                type="date"
-                name="toDate"
-                value={formData.toDate}
-                onChange={handleChange}
-                fullWidth
-                required
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                label="Number of Days"
-                type="number"
-                name="numberOfDays"
-                value={formData.numberOfDays}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                label="Reason"
-                name="reason"
-                value={formData.reason}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Button variant="contained" color="primary" type="submit" fullWidth>
-                {initialData ? 'Update Record' : 'Save Record'}
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </Box>
-    </Container>
+          </form>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 

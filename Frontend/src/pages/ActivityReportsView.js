@@ -14,6 +14,7 @@ import {
   IconButton,
   Button,
   Stack,
+  InputAdornment,
   FormControl,
   InputLabel,
   Select,
@@ -26,6 +27,7 @@ import { CSVLink } from 'react-csv';
 import { useReactToPrint } from 'react-to-print';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import 'react-toastify/dist/ReactToastify.css';
 
 function ActivityReportsView() {
   const { state } = useLocation();
@@ -33,7 +35,6 @@ function ActivityReportsView() {
   const printRef = useRef();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
-
   const [activityData, setActivityData] = useState(
     state?.formData ? [{ ...state.formData, id: Math.random() }] : []
   );
@@ -89,105 +90,56 @@ function ActivityReportsView() {
   );
 
   return (
-    <Container maxWidth="xl">
-      <Box
-        sx={{
-          padding: 4,
-          backgroundColor: 'background.paper',
-          borderRadius: 2,
-          boxShadow: 3,
-        }}
-      >
-        <Typography
-          variant="h4"
-          gutterBottom
-          sx={{ fontWeight: 'bold', color: 'primary.main' }}
-        >
-          Activity Reports
-        </Typography>
+    <Box sx={{ minHeight: '100vh', background: '#1D2B64', padding: 4 }}>
+      <Container maxWidth="lg">
+        <Box sx={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            Activity Reports View
+          </Typography>
 
-        {/* Search and Add New Record */}
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginBottom: 3,
-            flexWrap: 'wrap',
-          }}
-        >
+          {/* Search */}
           <TextField
-            label="Search Records"
+            label="Search"
             variant="outlined"
-            onChange={handleSearch}
             fullWidth
-            sx={{ maxWidth: '300px', marginBottom: 2 }}
+            value={searchTerm}
+            onChange={handleSearch}
+            sx={{ marginBottom: 2 }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start">🔍</InputAdornment>,
+            }}
           />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() =>
-              navigate('/ActivityReports', { state: { formData: {} } })
-            }
-            sx={{ marginLeft: 2, height: 'fit-content', borderRadius: 2 }}
-          >
-            Add New Activity Report
-          </Button>
-        </Box>
 
-        {/* Sort Dropdown */}
-        <FormControl fullWidth sx={{ marginBottom: 3 }}>
-          <InputLabel>Sort By</InputLabel>
-          <Select
-            value={sortOrder}
-            onChange={handleSortChange}
-            label="Sort By"
-            sx={{ borderRadius: 2 }}
-          >
-            <MenuItem value="asc">Ascending</MenuItem>
-            <MenuItem value="desc">Descending</MenuItem>
-          </Select>
-        </FormControl>
+          {/* Sort Dropdown */}
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+            <InputLabel>Sort By</InputLabel>
+            <Select
+              value={sortOrder}
+              onChange={handleSortChange}
+              label="Sort By"
+              sx={{ borderRadius: 2 }}
+            >
+              <MenuItem value="asc">Ascending</MenuItem>
+              <MenuItem value="desc">Descending</MenuItem>
+            </Select>
+          </FormControl>
 
-        {/* Table with scroll on smaller screens */}
-        <TableContainer
-          component={Paper}
-          ref={printRef}
-          sx={{
-            maxHeight: '500px',
-            overflow: 'auto',
-            borderRadius: 2,
-          }}
-        >
-          <Table>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: 'primary.main', color: 'white' }}>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>
-                  Activity Type
-                </TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>
-                  Title
-                </TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>
-                  Objectives
-                </TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>
-                  Students Attended
-                </TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>
-                  Date
-                </TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredData.length > 0 ? (
-                filteredData.map((entry) => (
-                  <TableRow
-                    key={entry.id}
-                    sx={{ '&:hover': { backgroundColor: '#f5f5f5' } }}
-                  >
+          {/* Table */}
+          <TableContainer component={Paper} sx={{ marginBottom: 2 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Activity Type</TableCell>
+                  <TableCell>Title</TableCell>
+                  <TableCell>Objectives</TableCell>
+                  <TableCell>Students Attended</TableCell>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredData.map((entry) => (
+                  <TableRow key={entry.id}>
                     <TableCell>{entry.activityType}</TableCell>
                     <TableCell>{entry.title}</TableCell>
                     <TableCell>{entry.objectives}</TableCell>
@@ -196,89 +148,45 @@ function ActivityReportsView() {
                     <TableCell>
                       <Stack direction="row" spacing={1}>
                         <IconButton
-                          size="small"
                           onClick={() => handleEdit(entry)}
-                          sx={{ color: 'primary.main' }}
+                          color="primary"
                         >
-                          <Edit fontSize="small" />
+                          <Edit />
                         </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDelete(entry.id)}
-                          sx={{ color: 'error.main' }}
-                        >
-                          <Delete fontSize="small" />
+                        <IconButton onClick={() => handleDelete(entry.id)} color="error">
+                          <Delete />
                         </IconButton>
                       </Stack>
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    align="center"
-                    sx={{ color: 'text.secondary' }}
-                  >
-                    No activity reports available.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-        {/* Export and Print Buttons */}
-        <Box
-          sx={{
-            marginTop: 2,
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Stack direction="row" spacing={2}>
+          {/* Export and Add New */}
+          <Stack direction="row" spacing={2} justifyContent="flex-end">
             <Button
-              variant="outlined"
-              color="primary"
-              size="small"
-              sx={{ borderRadius: 2 }}
-            >
-              <CSVLink
-                data={filteredData}
-                headers={[
-                  { label: 'Activity Type', key: 'activityType' },
-                  { label: 'Title', key: 'title' },
-                  { label: 'Objectives', key: 'objectives' },
-                  { label: 'Students Attended', key: 'studentsAttended' },
-                  { label: 'Date', key: 'date' },
-                ]}
-                filename="activity_reports.csv"
-                style={{ textDecoration: 'none', color: 'inherit' }}
-              >
-                Export to CSV
-              </CSVLink>
-            </Button>
-            <Button
-              variant="outlined"
-              color="secondary"
-              size="small"
-              sx={{ borderRadius: 2 }}
+              variant="contained"
+              color="success"
               onClick={handleExportPDF}
+              sx={{ fontWeight: 'bold' }}
             >
-              Export to PDF
+              Export PDF
             </Button>
             <Button
-              variant="outlined"
-              size="small"
-              sx={{ borderRadius: 2 }}
-              onClick={handlePrint}
+              variant="contained"
+              color="primary"
+              onClick={() =>
+                navigate('/ActivityReports', { state: { formData: {} } })
+              }
             >
-              Print
+              Add New Report
             </Button>
           </Stack>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 }
 
