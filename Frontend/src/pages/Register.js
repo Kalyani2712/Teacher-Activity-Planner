@@ -20,6 +20,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function TeacherRegistration() {
   const [formData, setFormData] = useState({
@@ -64,8 +65,27 @@ function TeacherRegistration() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log('Teacher Registration Data:', formData);
-      navigate('/TeacherProfile', { state: { formData } });
+      axios.post('http://localhost:5000/register', {
+        t_id: Date.now(), 
+        name: formData.teacherName,
+        email: formData.email,
+        password: formData.email.substring(0, 3)+"123",
+        designation: formData.designation,
+        qualification: formData.qualification,
+        faculty: formData.faculty,
+        department: formData.department,
+        DOB: formData.dateOfBirth,
+        phoneNo: formData.contactNumber,
+        res_address: formData.residentialAddress,
+        per_address: formData.permanentAddress
+      }).then(res => {
+        localStorage.setItem('id', res.data);
+        window.location.href = '/dashboard'
+        navigate('/Profile', { state: { formData } });
+      }).catch(error => {
+        setErrors({email: 'Email already exists'});
+        console.log(error);
+      })
     }
   };
 
@@ -117,6 +137,7 @@ function TeacherRegistration() {
             sx={{ fontWeight: 'bold', color: '#1976d2', marginBottom: 3 }}
           >
             Teacher Registration
+            {/* {error && <Typography color="error" sx={{ marginBottom: 2, textAlign: 'center' }}>{error}</Typography>} */}
           </Typography>
 
           <LinearProgress variant="determinate" value={progress} sx={{ marginBottom: 3 }} />

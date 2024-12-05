@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, IconButton, Box, Menu, MenuItem, Button, Select, FormControl, OutlinedInput, Drawer } from '@mui/material';
 import { AccountCircle, Menu as MenuIcon } from '@mui/icons-material';
-
-function Navbar({ onYearChange, user, onLogout }) {
+import { useNavigate } from 'react-router-dom';
+function Navbar({ onYearChange, user}) {
   const [selectedYear, setSelectedYear] = useState("2024-25");
   const [anchorEl, setAnchorEl] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-
+  const navigate = useNavigate();
   const handleYearChange = (event) => {
     setSelectedYear(event.target.value);
     if (onYearChange) {
@@ -14,8 +14,16 @@ function Navbar({ onYearChange, user, onLogout }) {
     }
   };
 
+  const onLogout = () => {
+    localStorage.removeItem('id');
+    window.location.href = '/';
+  }
+
   const handleMenuClick = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
+  const handleProfile = () => {
+    navigate('/Profile');
+  };
   const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
 
   return (
@@ -52,46 +60,30 @@ function Navbar({ onYearChange, user, onLogout }) {
                 <MenuItem value="2026-27">2026-27</MenuItem>
               </Select>
             </FormControl>
-
-            {user ? (
-              <>
-                <Typography
-                  variant="body1"
-                  sx={{ marginRight: 2, color: '#fff', fontSize: '1rem', fontWeight: 500 }}
-                >
-                  {user.username}
-                </Typography>
-                <IconButton onClick={handleMenuClick} color="inherit">
-                  <AccountCircle />
-                </IconButton>
-              </>
-            ) : (
-              <Button color="inherit" sx={{ fontSize: '0.9rem' }}>
-                Login
-              </Button>
-            )}
-
-            <IconButton edge="end" color="inherit" onClick={handleDrawerToggle}>
-              <MenuIcon />
-            </IconButton>
+            <IconButton onClick={handleMenuClick} color="inherit" edge="start" size='large'>
+              <Typography variant="body1" sx={{ marginRight: 2, color: '#fff', fontSize: '1rem', fontWeight: 500 }}>
+                {user.name}
+              </Typography>
+              <AccountCircle />
+            </IconButton><pre>     </pre>
           </Box>
         </Toolbar>
       </AppBar>
 
       {/* User Menu */}
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} sx={{ marginTop: '40px' }}>
-        <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+        <MenuItem onClick={handleProfile}>Profile</MenuItem>
         <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
         <MenuItem onClick={onLogout}>Logout</MenuItem>
       </Menu>
 
       {/* Mobile Drawer */}
-      <Drawer anchor="right" open={drawerOpen} onClose={handleDrawerToggle}>
-        <Box sx={{ width: 250, padding: 2 }}>
+      <Drawer anchor="center" open={drawerOpen} onClose={handleDrawerToggle}>
+        <Box sx={{ width: 50, padding: 2 }}>
           <Typography variant="h6" sx={{ marginBottom: 2 }}>
             Menu
           </Typography>
-          <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+          <MenuItem onClick={handleProfile}>Profile</MenuItem>
           <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
           <MenuItem onClick={onLogout}>Logout</MenuItem>
         </Box>

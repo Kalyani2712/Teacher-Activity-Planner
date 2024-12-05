@@ -37,6 +37,7 @@ import PublicationsEntry from './pages/Publications';
 import ResearchProjects from './pages/ResearchProjects'; // Importing the missing ResearchProjects component
 import MOOCsEntry from './pages/MOOCsContent'; // Import the MOOCs Entry Page
 import Login from './pages/Login'; // Add import for Login Page
+import axios from 'axios';
 
 
 function App() {
@@ -60,14 +61,25 @@ function App() {
 
   // State to handle if user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
 
  //localStorage.setItem('registeredUsers', JSON.stringify([{user: { email: 'admin', password: 'admin' }, 'isLoggedIn': false}]));
 
   useEffect(() => {
-    const id = localStorage.getItem('id') ? true : false;
-    setIsLoggedIn(id);
-  }, []);
-  console.log(isLoggedIn);
+    const id = localStorage.getItem('id') ? localStorage.getItem('id') : false;
+    if(id){
+      axios.get(`http://localhost:5000/info/${id}`).then(res => {
+        if(res.status === 200){
+          setUser(res.data[0]);
+          setIsLoggedIn(true);
+        }
+      }).catch(error => {
+        console.log(error);
+        localStorage.removeItem('id');
+      });
+    }
+    
+  }, [Navbar, Sidebar]);
   const handleSaveTeachingPlan = (newData) => {
     if (newData.id) {
       setTeachingPlanData(teachingPlanData.map((item) => (item.id === newData.id ? newData : item)));
@@ -158,7 +170,7 @@ function App() {
     <Router>
       {isLoggedIn ? (
         <>
-          <Navbar />
+          <Navbar user={user}/>
           <Sidebar />
           <div style={{ marginLeft: 240, paddingTop: 64 }}> {/* Adjust the marginLeft based on sidebar width */}
             <Routes>
@@ -184,14 +196,8 @@ function App() {
               <Route path="/Participation" element={<Participation onSave={(newData) => handleSaveData('participation', newData)} />} />
               <Route path="/ParticipationView" element={<ParticipationView data={participationData} onDelete={(id) => handleDeleteData('participation', id)} onEdit={(data) => handleEditData('participation', data)} />} />
               
-              <Route
-  path="/Publications"
-  element={<PublicationsEntry onSave={(newData) => handleSaveData('publication', newData)} />}
-/>
-<Route
-  path="/PublicationsView"
-  element={<PublicationsView data={publicationsData} onDelete={(id) => handleDeleteData('publication', id)} onEdit={(data) => handleEditData('publication', data)} />}
-/>
+              <Route path="/Publications" element={<PublicationsEntry onSave={(newData) => handleSaveData('publication', newData)} />} />
+              <Route path="/PublicationsView" element={<PublicationsView data={publicationsData} onDelete={(id) => handleDeleteData('publication', id)} onEdit={(data) => handleEditData('publication', data)} />} />
                    
               {/* Research Publications Routes */}
               <Route path="/ResearchProjects" element={<ResearchProjects onSave={(newData) => handleSaveData('publication', newData)} />} />

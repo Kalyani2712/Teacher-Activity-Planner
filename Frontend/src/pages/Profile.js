@@ -19,6 +19,7 @@ import {
   LinearProgress,
 } from '@mui/material';
 import { Email, Phone, Edit, Save, Cancel } from '@mui/icons-material';
+import axios from 'axios';
 
 function Profile() {
   const [formData, setFormData] = useState({
@@ -42,10 +43,21 @@ function Profile() {
 
   // Load the user data from localStorage
   useEffect(() => {
-    const storedData = localStorage.getItem('profileData');
-    if (storedData) {
-      setFormData(JSON.parse(storedData));
-    }
+    axios.get('http://localhost:5000/info/' + localStorage.getItem('id')).then(res => {
+      setFormData({
+        name: res.data[0].name,
+        designation: res.data[0].designation,
+        qualification: res.data[0].qualification,
+        faculty: res.data[0].faculty,
+        department: res.data[0].department,
+        contactNumber: res.data[0].phoneNo,
+        email: res.data[0].email,
+        residentialAddress: res.data[0].res_address,
+        permanentAddress: res.data[0].per_address
+      });
+    }).catch(err => {
+      console.log(err);
+    });
   }, []);
 
   const handleChange = (e) => {

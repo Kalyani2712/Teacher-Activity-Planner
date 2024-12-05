@@ -1,12 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Drawer, List, ListItem, ListItemText, ListItemIcon, IconButton, Box, Tooltip, Divider } from '@mui/material';
 import { Home, Dashboard, LibraryBooks, Assignment, ExitToApp, Menu, Person, Settings } from '@mui/icons-material';  // Material icons
 import { Link } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
+import axios from 'axios';
 
 function Sidebar() {
   const [open, setOpen] = useState(true); // Manage sidebar open state
   const theme = useTheme();
+  const [userName, setUserName] = useState('');
+  const [userRole, setUserRole] = useState('');
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/info/' + localStorage.getItem('id')).then(res => {
+      console.log(res.data[0].name);
+      setUserName(res.data[0].name);
+      setUserRole(res.data[0].designation);
+    }).catch(err => {
+      console.log(err);
+    });
+  },[]);
 
   // Toggle the sidebar
   const handleSidebarToggle = () => setOpen(!open);
@@ -48,7 +61,7 @@ function Sidebar() {
         </Tooltip>
         {open && (
           <Box sx={{ marginLeft: 2 }}>
-            <ListItemText primary="John Doe" secondary="Professor" />
+            <ListItemText primary={userName} secondary={userRole} />
           </Box>
         )}
       </Box>

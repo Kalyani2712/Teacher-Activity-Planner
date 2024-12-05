@@ -24,6 +24,10 @@ function TeacherInfo(server, db) {
     server.get('/info/:id', async (req, res) => {
         try{
             const info = await db('teachers').where('t_id', req.params.id);
+            if (info.length === 0){
+                res.sendStatus(404);
+                return;
+            }
             res.json(info);
         } catch(err){
             console.log(err);
@@ -53,7 +57,7 @@ function TeacherInfo(server, db) {
         }
         try{
             await db('teachers').insert(info);
-            res.sendStatus(200);
+            res.json(info.t_id);
         } catch(err){
             console.log(err);
             res.sendStatus(500);

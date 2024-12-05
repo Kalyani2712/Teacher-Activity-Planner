@@ -4,7 +4,6 @@ import { Assignment, AccessTime, Group, LibraryBooks, RateReview, Book } from '@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { BarChart, Bar } from 'recharts';
 import Sidebar from '../components/Sidebar';
-import Navbar from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
 
 // Sample Data for demonstration
@@ -70,9 +69,6 @@ function Dashboard() {
 
       {/* Main Content */}
       <Box sx={{ width: '100%', padding: 2, backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: 3 }}>
-        {/* Navbar */}
-        <Navbar />
-
         <Container maxWidth="lg">
           <Box sx={{ padding: 3 }}>
             <Typography variant="h4" gutterBottom sx={{ color: '#ff4081', fontFamily: 'Comic Sans MS', fontWeight: 'bold' }}>

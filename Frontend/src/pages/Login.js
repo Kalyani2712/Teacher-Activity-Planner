@@ -9,12 +9,10 @@ function Login({ isLoggedIn, setIsLoggedIn }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      setIsLoggedIn(true);
-      navigate('/dashboard');
-    }
-  }, [navigate]);
+  
+  if (isLoggedIn) {
+    window.location.href = '/dashboard';;
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,7 +36,6 @@ function Login({ isLoggedIn, setIsLoggedIn }) {
     }
 
     axios.post('http://localhost:5000/auth', data).then(res => {
-      console.log(res);
       localStorage.setItem('id', res.data);
       window.location.href = '/dashboard';
     }).catch(error => {
