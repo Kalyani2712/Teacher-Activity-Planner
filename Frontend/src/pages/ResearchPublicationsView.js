@@ -78,114 +78,132 @@ function ResearchProjectsView({ data, onDelete, onEdit }) {
   };
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ padding: 3, backgroundColor: '#ffffff', borderRadius: '10px', boxShadow: 3 }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: '#333' }}>
-          Research Projects Data View
-        </Typography>
-
-        {/* Add/Edit Button */}
-        <Box sx={{ marginBottom: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => navigate('/ResearchProjects')}
-            size="small"
-            sx={{ fontWeight: 'bold', borderRadius: '5px' }}
-          >
-            Add Project
-          </Button>
-        </Box>
-
-        {/* Search Box */}
-        <TextField
-          label="Search"
-          variant="outlined"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          fullWidth
-          sx={{ marginBottom: 2 }}
-          InputProps={{
-            startAdornment: <InputAdornment position="start">🔍</InputAdornment>,
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: '#1D2B64', // Gradient background
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 4,
+      }}
+    >
+      <Container maxWidth="lg">
+        <Box
+          sx={{
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            padding: 4,
           }}
-        />
+        >
+          <Typography variant="h5" gutterBottom>
+            Research Projects Data View
+          </Typography>
 
-        {/* Table */}
-        <TableContainer component={Paper} ref={printRef} sx={{ borderRadius: '8px' }}>
-          <Table>
-            <TableHead sx={{ backgroundColor: '#1976d2', color: '#fff' }}>
-              <TableRow>
-                <TableCell sx={{ color: '#fff' }}>Sr. No.</TableCell>
-                <TableCell sx={{ color: '#fff' }}>Principal Investigator</TableCell>
-                <TableCell sx={{ color: '#fff' }}>Co-Investigators</TableCell>
-                <TableCell sx={{ color: '#fff' }}>Project Title</TableCell>
-                <TableCell sx={{ color: '#fff' }}>Duration</TableCell>
-                <TableCell sx={{ color: '#fff' }}>Funding Agency</TableCell>
-                <TableCell sx={{ color: '#fff' }}>Amount Sanctioned</TableCell>
-                <TableCell sx={{ color: '#fff' }}>Date of Sanction</TableCell>
-                <TableCell sx={{ color: '#fff' }}>Status</TableCell>
-                <TableCell sx={{ color: '#fff' }}>Date of Submission</TableCell>
-                <TableCell sx={{ color: '#fff' }}>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredData.map((entry, index) => (
-                <TableRow key={entry.id}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{entry.principalInvestigator}</TableCell>
-                  <TableCell>{entry.coInvestigators}</TableCell>
-                  <TableCell>{entry.projectTitle}</TableCell>
-                  <TableCell>{entry.duration}</TableCell>
-                  <TableCell>{entry.fundingAgency}</TableCell>
-                  <TableCell>{entry.amountSanctioned}</TableCell>
-                  <TableCell>{entry.dateOfSanction}</TableCell>
-                  <TableCell>{entry.status}</TableCell>
-                  <TableCell>{entry.dateOfSubmission}</TableCell>
-                  <TableCell>
-                    <Stack direction="row" spacing={1}>
-                      <IconButton
-                        color="primary"
-                        onClick={() => onEdit(entry)}
-                      >
-                        <Edit />
-                      </IconButton>
-                      <IconButton
-                        color="secondary"
-                        onClick={() => onDelete(entry.id)}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </Stack>
-                  </TableCell>
+          {/* Add/Edit Button */}
+          <Box sx={{ marginBottom: 2 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate('/ResearchProjects')}
+              size="small"
+              sx={{ fontWeight: 'bold', borderRadius: '5px' }}
+            >
+              Add Project
+            </Button>
+          </Box>
+
+          {/* Search Box */}
+          <TextField
+            label="Search"
+            variant="outlined"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start">🔍</InputAdornment>,
+            }}
+          />
+
+          {/* Table */}
+          <TableContainer component={Paper} ref={printRef} sx={{ marginBottom: 2 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Sr. No.</TableCell>
+                  <TableCell>Principal Investigator</TableCell>
+                  <TableCell>Co-Investigators</TableCell>
+                  <TableCell>Project Title</TableCell>
+                  <TableCell>Duration</TableCell>
+                  <TableCell>Funding Agency</TableCell>
+                  <TableCell>Amount Sanctioned</TableCell>
+                  <TableCell>Date of Sanction</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Date of Submission</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {filteredData.map((entry, index) => (
+                  <TableRow key={entry.id}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{entry.principalInvestigator}</TableCell>
+                    <TableCell>{entry.coInvestigators}</TableCell>
+                    <TableCell>{entry.projectTitle}</TableCell>
+                    <TableCell>{entry.duration}</TableCell>
+                    <TableCell>{entry.fundingAgency}</TableCell>
+                    <TableCell>{entry.amountSanctioned}</TableCell>
+                    <TableCell>{entry.dateOfSanction}</TableCell>
+                    <TableCell>{entry.status}</TableCell>
+                    <TableCell>{entry.dateOfSubmission}</TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1}>
+                        <IconButton
+                          color="primary"
+                          onClick={() => onEdit(entry)}
+                        >
+                          <Edit />
+                        </IconButton>
+                        <IconButton
+                          color="secondary"
+                          onClick={() => onDelete(entry.id)}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-        {/* Export Buttons */}
-        <Box sx={{ marginTop: 3 }}>
-          <Stack direction="row" spacing={2}>
-            <Button variant="outlined" color="primary">
-              <CSVLink
-                data={filteredData}
-                headers={headers}
-                filename="research_projects.csv"
-                style={{ textDecoration: 'none', color: 'inherit' }}
-              >
-                Export to CSV
-              </CSVLink>
-            </Button>
-            <Button variant="outlined" color="secondary" onClick={handleExportPDF}>
-              Export to PDF
-            </Button>
-            <Button variant="outlined" onClick={handlePrint}>
-              Print
-            </Button>
-          </Stack>
+          {/* Export Buttons */}
+          <Box sx={{ marginTop: 2 }}>
+            <Stack direction="row" spacing={2}>
+              <Button variant="outlined" color="primary">
+                <CSVLink
+                  data={filteredData}
+                  headers={headers}
+                  filename="research_projects.csv"
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  Export to CSV
+                </CSVLink>
+              </Button>
+              <Button variant="outlined" color="secondary" onClick={handleExportPDF}>
+                Export to PDF
+              </Button>
+              <Button variant="outlined" onClick={handlePrint}>
+                Print
+              </Button>
+            </Stack>
+          </Box>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 }
 

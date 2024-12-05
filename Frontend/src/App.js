@@ -22,17 +22,22 @@ import TeachingPlan from './pages/TeachingPlan'; // Teaching Plan Entry Page
 import TeachingPlanView from './pages/TeachingPlanView'; // Teaching Plan View Page
 import SyllabusCompletionView from './pages/SyllabusCompletionView';
 import SyllabusReport  from './pages/SyllabusReport';
+import Synopsis from './pages/Synopsis';
+import SynopsisView  from './pages/SynopsisView';
 import ActivityReports from './pages/ActivityReports'; 
 import ActivityReportsView from './pages/ActivityReportsView';
 import CourseOutcome from './pages/CourseOutcome';
 import CourseOutcomeView from './pages/CourseOutcomeView';
 import CentralAssessment from './pages/CentralAssessment';
 import CentralAssessmentView from './pages/CentralAssessmentView';
+import LectureDetailsView from './pages/LectureDetailsView';
+import LectureDetails from './pages/LectureDetails';
 import './App.css';
 import PublicationsEntry from './pages/Publications';
 import ResearchProjects from './pages/ResearchProjects'; // Importing the missing ResearchProjects component
 import MOOCsEntry from './pages/MOOCsContent'; // Import the MOOCs Entry Page
 import Login from './pages/Login'; // Add import for Login Page
+
 
 function App() {
   const [teachingPlanData, setTeachingPlanData] = useState([]);
@@ -148,6 +153,7 @@ function App() {
     }
   };
 
+  
   return (
     <Router>
       {isLoggedIn ? (
@@ -178,9 +184,16 @@ function App() {
               <Route path="/Participation" element={<Participation onSave={(newData) => handleSaveData('participation', newData)} />} />
               <Route path="/ParticipationView" element={<ParticipationView data={participationData} onDelete={(id) => handleDeleteData('participation', id)} onEdit={(data) => handleEditData('participation', data)} />} />
               
-              {/* Publications Routes */}
-              <Route path="/Publications" element={<PublicationsEntry onSave={(newData) => handleSaveData('publication', newData)} />} />
-              <Route path="/PublicationsView" element={<PublicationsView data={publicationsData} onDelete={(id) => handleDeleteData('publication', id)} onEdit={(data) => handleEditData('publication', data)} />} />
+              <Route
+  path="/Publications"
+  element={<PublicationsEntry onSave={(newData) => handleSaveData('publication', newData)} />}
+/>
+<Route
+  path="/PublicationsView"
+  element={<PublicationsView data={publicationsData} onDelete={(id) => handleDeleteData('publication', id)} onEdit={(data) => handleEditData('publication', data)} />}
+/>
+                   
+              {/* Research Publications Routes */}
               <Route path="/ResearchProjects" element={<ResearchProjects onSave={(newData) => handleSaveData('publication', newData)} />} />
               <Route path="/ResearchPublicationsView" element={<ResearchPublicationsView data={publicationsData} onDelete={(id) => handleDeleteData('publication', id)} onEdit={(data) => handleEditData('publication', data)} />} />
               
@@ -207,9 +220,14 @@ function App() {
                     onEdit={(data) => handleEditTeachingPlan(data)}
                   />
                 }
-              />
+              /> 
+              <Route path="/LectureDetails" element={<LectureDetails/>}/>
+               <Route path="/LectureDetailsView" element={<LectureDetailsView />} />
+               <Route path="/SyllabusReport" element={<SyllabusReport />} />
               <Route path="/SyllabusCompletionView" element={<SyllabusCompletionView />} />
               <Route path="/SyllabusReport" element={<SyllabusReport />} />
+              <Route path="/SynopsisView" element={<SynopsisView />} />
+              <Route path="/Synopsis" element={<Synopsis />} />
               <Route path="/ActivityReports" element={<ActivityReports />} />
               <Route path="/ActivityReportsView" element={<ActivityReportsView />} />
               <Route path="/CourseOutcome" element={<CourseOutcome />} />

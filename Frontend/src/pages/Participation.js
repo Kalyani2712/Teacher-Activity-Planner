@@ -27,119 +27,166 @@ function ParticipationEntry({ onSave }) {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          Participation in Events/Conferences/Workshops
-        </Typography>
-        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-          <Grid container spacing={2}>
-            {/* Event Type */}
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Event Type"
-                variant="outlined"
-                name="eventType"
-                value={participationData.eventType}
-                onChange={handleChange}
-              />
-            </Grid>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(to right, #2c3e50, #3498db)', // Gradient background
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 4,
+      }}
+    >
+      <Container maxWidth="sm">
+        <Box
+          sx={{
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            padding: 4,
+          }}
+        >
+          <Typography
+            variant="h5"
+            gutterBottom
+            sx={{ textAlign: 'center', fontWeight: 'bold', color: '#333' }}
+          >
+            Participation in Events/Conferences/Workshops
+          </Typography>
 
-            {/* Title */}
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Title"
-                variant="outlined"
-                name="title"
-                value={participationData.title}
-                onChange={handleChange}
-              />
-            </Grid>
-
-            {/* Organization */}
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Organization"
-                variant="outlined"
-                name="organization"
-                value={participationData.organization}
-                onChange={handleChange}
-              />
-            </Grid>
-
-            {/* Level Dropdown */}
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Level</InputLabel>
-                <Select
-                  name="level"
-                  value={participationData.level}
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={3}>
+              {/* Event Type */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Event Type"
+                  variant="outlined"
+                  name="eventType"
+                  value={participationData.eventType}
                   onChange={handleChange}
-                  label="Level"
+                  required
+                  sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
+                />
+              </Grid>
+
+              {/* Title */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Title"
+                  variant="outlined"
+                  name="title"
+                  value={participationData.title}
+                  onChange={handleChange}
+                  required
+                  sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
+                />
+              </Grid>
+
+              {/* Organization */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Organization"
+                  variant="outlined"
+                  name="organization"
+                  value={participationData.organization}
+                  onChange={handleChange}
+                  required
+                  sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
+                />
+              </Grid>
+
+              {/* Level Dropdown */}
+              <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <InputLabel>Level</InputLabel>
+                  <Select
+                    name="level"
+                    value={participationData.level}
+                    onChange={handleChange}
+                    required
+                    sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
+                  >
+                    <MenuItem value="International">International</MenuItem>
+                    <MenuItem value="National">National</MenuItem>
+                    <MenuItem value="State">State</MenuItem>
+                    <MenuItem value="University">University</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Start Date */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Start Date"
+                  variant="outlined"
+                  name="startDate"
+                  type="date"
+                  value={participationData.startDate}
+                  onChange={handleChange}
+                  required
+                  InputLabelProps={{ shrink: true }}
+                  sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
+                />
+              </Grid>
+
+              {/* End Date */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="End Date"
+                  variant="outlined"
+                  name="endDate"
+                  type="date"
+                  value={participationData.endDate}
+                  onChange={handleChange}
+                  required
+                  InputLabelProps={{ shrink: true }}
+                  sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
+                />
+              </Grid>
+
+              {/* Details */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Details"
+                  variant="outlined"
+                  name="details"
+                  value={participationData.details}
+                  onChange={handleChange}
+                  multiline
+                  rows={4}
+                  required
+                  sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
+                />
+              </Grid>
+
+              {/* Save Button */}
+              <Grid item xs={12}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  type="submit"
+                  fullWidth
+                  sx={{
+                    fontWeight: 'bold',
+                    borderRadius: '5px',
+                    backgroundColor: '#3498db',
+                    '&:hover': { backgroundColor: '#2980b9' },
+                  }}
                 >
-                  <MenuItem value="International">International</MenuItem>
-                  <MenuItem value="National">National</MenuItem>
-                  <MenuItem value="State">State</MenuItem>
-                  <MenuItem value="University">University</MenuItem>
-                </Select>
-              </FormControl>
+                  Save Participation
+                </Button>
+              </Grid>
             </Grid>
-
-            {/* Start Date */}
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Start Date"
-                variant="outlined"
-                name="startDate"
-                type="date"
-                value={participationData.startDate}
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-
-            {/* End Date */}
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="End Date"
-                variant="outlined"
-                name="endDate"
-                type="date"
-                value={participationData.endDate}
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-
-            {/* Details */}
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Details"
-                variant="outlined"
-                name="details"
-                value={participationData.details}
-                onChange={handleChange}
-                multiline
-                rows={4}
-              />
-            </Grid>
-
-            {/* Save Button */}
-            <Grid item xs={12}>
-              <Button variant="contained" color="primary" type="submit" fullWidth>
-                Save Participation
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </Box>
-    </Container>
+          </form>
+        </Box>
+      </Container>
+    </Box>
   );
 }
 

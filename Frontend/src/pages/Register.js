@@ -1,209 +1,275 @@
 import React, { useState } from 'react';
-import { Button, TextField, Container, Grid, Typography, Box, FormControl, InputLabel, Select, MenuItem, FormHelperText } from '@mui/material';
+import {
+  Button,
+  TextField,
+  Container,
+  Grid,
+  Typography,
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Divider,
+  Paper,
+  LinearProgress,
+  Tooltip,
+  InputAdornment,
+} from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate } from 'react-router-dom';
 
-function Register() {
+function TeacherRegistration() {
   const [formData, setFormData] = useState({
-    name: '',
+    teacherName: '',
     designation: '',
     qualification: '',
     faculty: '',
     department: '',
-    dob: '',
-    contactNumber: '',
+    dateOfBirth: '',
     email: '',
     residentialAddress: '',
     permanentAddress: '',
-    password: '',
-    confirmPassword: ''
   });
 
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => {
+      const updatedData = { ...prev, [name]: value };
+      calculateProgress(updatedData);
+      return updatedData;
+    });
+  };
+
+  const calculateProgress = (data) => {
+    const filledFields = Object.values(data).filter((value) => value.trim() !== '').length;
+    setProgress((filledFields / Object.keys(data).length) * 100);
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.teacherName) newErrors.teacherName = 'Teacher name is required';
+    if (!formData.email) newErrors.email = 'Email is required';
+    if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of Birth is required';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    // Check if passwords match
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
+    if (validateForm()) {
+      console.log('Teacher Registration Data:', formData);
+      navigate('/TeacherProfile', { state: { formData } });
     }
+  };
 
-    // Check for required fields
-    for (let key in formData) {
-      if (formData[key] === '') {
-        setError(`${key.charAt(0).toUpperCase() + key.slice(1)} is required`);
-        setLoading(false);
-        return;
-      }
-    }
+  const handleReset = () => {
+    setFormData({
+      teacherName: '',
+      designation: '',
+      qualification: '',
+      faculty: '',
+      department: '',
+      dateOfBirth: '',
+      email: '',
+      residentialAddress: '',
+      permanentAddress: '',
+    });
+    setErrors({});
+    setProgress(0);
+  };
 
-    console.log('Registered:', formData);
-    setLoading(false);
-    // Handle registration (e.g., API call)
+  const handleBack = () => {
+    navigate(-1);
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 3 }}>
-        <Typography variant="h4" gutterBottom>Register for Teacher Activity Planner</Typography>
-        {error && <Typography color="error" sx={{ marginBottom: 2 }}>{error}</Typography>}
-        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Name"
-                variant="outlined"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
+    <Box sx={{ minHeight: '100vh', background: '#1D2B64', padding: 4 }}>
+      <Container maxWidth="lg">
+        <Box
+          sx={{
+            padding: 4,
+            borderRadius: 4,
+            boxShadow: 6,
+            backgroundColor: '#ffffff',
+            position: 'relative',
+          }}
+        >
+          <Button
+            variant="text"
+            startIcon={<ArrowBackIcon />}
+            onClick={handleBack}
+            sx={{ marginBottom: 2, color: '#1976d2' }}
+          >
+            Back
+          </Button>
+
+          <Typography
+            variant="h4"
+            align="center"
+            gutterBottom
+            sx={{ fontWeight: 'bold', color: '#1976d2', marginBottom: 3 }}
+          >
+            Teacher Registration
+          </Typography>
+
+          <LinearProgress variant="determinate" value={progress} sx={{ marginBottom: 3 }} />
+
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Name of Teacher"
+                  variant="outlined"
+                  name="teacherName"
+                  value={formData.teacherName}
+                  onChange={handleChange}
+                  error={!!errors.teacherName}
+                  helperText={errors.teacherName}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Tooltip title="Enter the teacher's full name.">
+                          <InfoIcon color="action" />
+                        </Tooltip>
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{ backgroundColor: '#f9f9f9' }}
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Designation"
+                  variant="outlined"
+                  name="designation"
+                  value={formData.designation}
+                  onChange={handleChange}
+                  sx={{ backgroundColor: '#f9f9f9' }}
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Qualification"
+                  variant="outlined"
+                  name="qualification"
+                  value={formData.qualification}
+                  onChange={handleChange}
+                  sx={{ backgroundColor: '#f9f9f9' }}
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Faculty"
+                  variant="outlined"
+                  name="faculty"
+                  value={formData.faculty}
+                  onChange={handleChange}
+                  sx={{ backgroundColor: '#f9f9f9' }}
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Department"
+                  variant="outlined"
+                  name="department"
+                  value={formData.department}
+                  onChange={handleChange}
+                  sx={{ backgroundColor: '#f9f9f9' }}
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Date of Birth"
+                  type="date"
+                  variant="outlined"
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
+                  onChange={handleChange}
+                  error={!!errors.dateOfBirth}
+                  helperText={errors.dateOfBirth}
+                  InputLabelProps={{ shrink: true }}
+                  sx={{ backgroundColor: '#f9f9f9' }}
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Email"
+                  variant="outlined"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  error={!!errors.email}
+                  helperText={errors.email}
+                  sx={{ backgroundColor: '#f9f9f9' }}
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Residential Address"
+                  variant="outlined"
+                  name="residentialAddress"
+                  value={formData.residentialAddress}
+                  onChange={handleChange}
+                  sx={{ backgroundColor: '#f9f9f9' }}
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Permanent Address"
+                  variant="outlined"
+                  name="permanentAddress"
+                  value={formData.permanentAddress}
+                  onChange={handleChange}
+                  sx={{ backgroundColor: '#f9f9f9' }}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <Divider sx={{ marginY: 3 }} />
+                <Box display="flex" justifyContent="space-between">
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={handleReset}
+                    startIcon={<RestartAltIcon />}
+                  >
+                    Reset
+                  </Button>
+                  <Button variant="contained" color="primary" type="submit">
+                    Save Registration Data
+                  </Button>
+                </Box>
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Designation"
-                variant="outlined"
-                name="designation"
-                value={formData.designation}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Qualification"
-                variant="outlined"
-                name="qualification"
-                value={formData.qualification}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Faculty"
-                variant="outlined"
-                name="faculty"
-                value={formData.faculty}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Department"
-                variant="outlined"
-                name="department"
-                value={formData.department}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Date of Birth"
-                variant="outlined"
-                name="dob"
-                type="date"
-                value={formData.dob}
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Contact Number"
-                variant="outlined"
-                name="contactNumber"
-                value={formData.contactNumber}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Email"
-                variant="outlined"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Residential Address"
-                variant="outlined"
-                name="residentialAddress"
-                value={formData.residentialAddress}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Permanent Address"
-                variant="outlined"
-                name="permanentAddress"
-                value={formData.permanentAddress}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Password"
-                variant="outlined"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Confirm Password"
-                variant="outlined"
-                name="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" color="primary" type="submit" fullWidth disabled={loading}>
-                {loading ? 'Registering...' : 'Register'}
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </Box>
-    </Container>
+          </form>
+        </Box>
+      </Container>
+    </Box>
   );
 }
 
-export default Register;
+export default TeacherRegistration;

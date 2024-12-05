@@ -1,207 +1,268 @@
 import React, { useState, useRef } from 'react';
-import { Container, Typography, Box, Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Button, TextField, InputAdornment, TablePagination, TableSortLabel } from '@mui/material';
-import { Edit, Delete, Add, Search } from '@mui/icons-material';
+import {
+  Container,
+  Typography,
+  Box,
+  Paper,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  IconButton,
+  Button,
+  Stack,
+  TextField,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material';
+import { Edit, Delete } from '@mui/icons-material';
 import { CSVLink } from 'react-csv';
 import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 import { useReactToPrint } from 'react-to-print';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 const headers = [
-  { label: 'Programme Name', key: 'programmeName' },
   { label: 'Course Name', key: 'courseName' },
-  { label: 'MOOCs Title', key: 'title' },
-  { label: 'ICT Resources', key: 'ictResources' },
-  { label: 'Date Implemented/Approved', key: 'dateImplemented' },
-  { label: 'Content Type', key: 'contentType' },
-  { label: 'Details', key: 'details' },
+  { label: 'Platform', key: 'platform' },
+  { label: 'Completion Date', key: 'completionDate' },
+  { label: 'Certificate Link', key: 'certificateLink' },
 ];
 
 function MOOCsView({ data, onDelete, onEdit }) {
   const printRef = useRef();
-  const history = useNavigate();
-
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
-  const [sortBy, setSortBy] = useState('programmeName');
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [filteredData, setFilteredData] = useState(data);
 
-  // Print functionality
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
   });
 
-  // Export to PDF functionality
   const handleExportPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['Programme Name', 'Course Name', 'MOOCs Title', 'ICT Resources', 'Date Implemented/Approved', 'Content Type', 'Details']],
-      body: data.map(item => [item.programmeName, item.courseName, item.title, item.ictResources, item.dateImplemented, item.contentType, item.details]),
+      head: [['Course Name', 'Platform', 'Completion Date', 'Certificate Link']],
+      body: filteredData.map((item) => [
+        item.courseName,
+        item.platform,
+        item.completionDate,
+        item.certificateLink,
+      ]),
     });
-    doc.save('moocs_and_e_content.pdf');
+    doc.save('moocs_data.pdf');
   };
 
-  // Handling search input change
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+    const query = e.target.value.toLowerCase();
+    setSearchTerm(query);
+    setFilteredData(
+      data.filter(
+        (item) =>
+          item.courseName.toLowerCase().includes(query) ||
+          item.platform.toLowerCase().includes(query)
+      )
+    );
   };
 
-  // Sorting handler
-  const handleSortRequest = (property) => {
-    const isAsc = sortBy === property && sortOrder === 'asc';
-    setSortOrder(isAsc ? 'desc' : 'asc');
-    setSortBy(property);
+  const handleSortChange = (e) => {
+    const order = e.target.value;
+    setSortOrder(order);
+    const sorted = [...filteredData].sort((a, b) =>
+      order === 'asc' ? a.courseName.localeCompare(b.courseName) : b.courseName.localeCompare(a.courseName)
+    );
+    setFilteredData(sorted);
   };
 
-  // Handle edit action
   const handleEdit = (entry) => {
     onEdit(entry);
-    history(`/MOOCsContent/${entry.id}`);
+    navigate('/MOOCsContent'); // Navigate to add/edit page
   };
 
-  // Handle Add New button click
-  const handleAddNew = () => {
-    history('/MOOCsContent');
+  const handleAddClick = () => {
+    navigate('/MOOCsContent'); // Navigate to add new course
   };
-
-  // Filter data based on search term
-  const filteredData = data.filter(
-    (item) =>
-      item.programmeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.courseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.ictResources.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Sort the data based on the selected column and order
-  const sortedData = filteredData.sort((a, b) => {
-    if (sortOrder === 'asc') {
-      return a[sortBy] < b[sortBy] ? -1 : 1;
-    }
-    return a[sortBy] < b[sortBy] ? 1 : -1;
-  });
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ padding: 3 }}>
-        <Typography variant="h5" gutterBottom>MOOCs and E-content Data View</Typography>
-
-        <Button variant="contained" color="primary" sx={{ marginBottom: 2 }} onClick={handleAddNew}>
-          <Add /> Add New
-        </Button>
-
-        {/* Search bar */}
-        <TextField
-          label="Search"
-          variant="outlined"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          fullWidth
-          sx={{ marginBottom: 3 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: '#1D2B64',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 4,
+      }}
+    >
+      <Container maxWidth="lg">
+        <Box
+          sx={{
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            padding: 4,
           }}
-        />
+        >
+          <Typography variant="h5" gutterBottom>
+            MOOCs Data View
+          </Typography>
 
-        {/* Table for displaying data */}
-        <TableContainer component={Paper} sx={{ marginTop: 3 }} ref={printRef}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'programmeName'}
-                    direction={sortBy === 'programmeName' ? sortOrder : 'asc'}
-                    onClick={() => handleSortRequest('programmeName')}
-                  >
-                    Programme Name
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'courseName'}
-                    direction={sortBy === 'courseName' ? sortOrder : 'asc'}
-                    onClick={() => handleSortRequest('courseName')}
-                  >
-                    Course Name
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'title'}
-                    direction={sortBy === 'title' ? sortOrder : 'asc'}
-                    onClick={() => handleSortRequest('title')}
-                  >
-                    MOOCs Title
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>ICT Resources</TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'dateImplemented'}
-                    direction={sortBy === 'dateImplemented' ? sortOrder : 'asc'}
-                    onClick={() => handleSortRequest('dateImplemented')}
-                  >
-                    Date Implemented/Approved
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((entry) => (
-                <TableRow key={entry.id}>
-                  <TableCell>{entry.programmeName}</TableCell>
-                  <TableCell>{entry.courseName}</TableCell>
-                  <TableCell>{entry.title}</TableCell>
-                  <TableCell>{entry.ictResources}</TableCell>
-                  <TableCell>{entry.dateImplemented}</TableCell>
-                  <TableCell>
-                    <IconButton onClick={() => handleEdit(entry)}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton onClick={() => onDelete(entry.id)}>
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
+          {/* Add Button */}
+          <Box sx={{ marginBottom: 2 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={handleAddClick}
+              sx={{ fontWeight: 'bold', borderRadius: '5px' }}
+            >
+              Add MOOC
+            </Button>
+          </Box>
+
+          {/* Search Bar */}
+          <TextField
+            label="Search"
+            variant="outlined"
+            fullWidth
+            value={searchTerm}
+            onChange={handleSearchChange}
+            sx={{ marginBottom: 2 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  🔍
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          {/* Sort Dropdown */}
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+            <InputLabel>Sort By</InputLabel>
+            <Select value={sortOrder} onChange={handleSortChange} label="Sort By">
+              <MenuItem value="asc">Ascending</MenuItem>
+              <MenuItem value="desc">Descending</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Table */}
+          <TableContainer component={Paper} ref={printRef} sx={{ marginBottom: 2 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Sr. No.</TableCell>
+                  <TableCell>Course Name</TableCell>
+                  <TableCell>Platform</TableCell>
+                  <TableCell>Completion Date</TableCell>
+                  <TableCell>Certificate Link</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {filteredData.length > 0 ? (
+                  filteredData.map((entry, index) => (
+                    <TableRow key={entry.id}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{entry.courseName}</TableCell>
+                      <TableCell>{entry.platform}</TableCell>
+                      <TableCell>{entry.completionDate}</TableCell>
+                      <TableCell>
+                        <a href={entry.certificateLink} target="_blank" rel="noopener noreferrer">
+                          View Certificate
+                        </a>
+                      </TableCell>
+                      <TableCell>
+                        <Stack direction="row" spacing={1}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEdit(entry)}
+                            sx={{ color: '#1976d2' }}
+                          >
+                            <Edit fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => onDelete(entry.id)}
+                            sx={{ color: '#d32f2f' }}
+                          >
+                            <Delete fontSize="small" />
+                          </IconButton>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center">
+                      No MOOCs found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-        {/* Table Pagination */}
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={filteredData.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={(e, newPage) => setPage(newPage)}
-          onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
-        />
-
-        {/* Export buttons */}
-        <Box sx={{ marginTop: 3 }}>
-          <Button variant="outlined" color="primary" sx={{ marginRight: 2 }}>
-            <CSVLink data={data} headers={headers} filename="moocs_and_e_content.csv">
-              Export to CSV
-            </CSVLink>
-          </Button>
-          <Button variant="outlined" color="secondary" sx={{ marginRight: 2 }} onClick={handleExportPDF}>
-            Export to PDF
-          </Button>
-          <Button variant="outlined" sx={{ marginRight: 2 }} onClick={handlePrint}>
-            Print
-          </Button>
+          {/* Export Buttons */}
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="outlined"
+              color="primary"
+              size="small"
+              sx={{ fontWeight: 'bold', borderRadius: '5px' }}
+            >
+              <CSVLink
+                data={filteredData}
+                headers={headers}
+                filename="moocs_data.csv"
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                Export to CSV
+              </CSVLink>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              size="small"
+              onClick={handleExportPDF}
+              sx={{ fontWeight: 'bold', borderRadius: '5px' }}
+            >
+              Export to PDF
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handlePrint}
+              sx={{ fontWeight: 'bold', borderRadius: '5px' }}
+            >
+              Print
+            </Button>
+          </Stack>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 }
+
+MOOCsView.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      courseName: PropTypes.string.isRequired,
+      platform: PropTypes.string.isRequired,
+      completionDate: PropTypes.string.isRequired,
+      certificateLink: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
+};
 
 export default MOOCsView;

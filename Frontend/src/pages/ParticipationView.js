@@ -25,6 +25,7 @@ import { CSVLink } from 'react-csv';
 import { jsPDF } from 'jspdf';
 import { useReactToPrint } from 'react-to-print';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const headers = [
   { label: 'Event Type', key: 'eventType' },
@@ -89,143 +90,193 @@ function ParticipationView({ data, onDelete, onEdit }) {
     return 0;
   });
 
+  // Handle delete
+  const handleDelete = (id) => {
+    onDelete(id); // Delete record from parent component
+    toast.success('Record deleted successfully!'); // Notify success
+  };
+
   // Navigate to Add/Edit Page
   const handleAddOrEditClick = () => {
     navigate('/Participation'); // Navigate to the Add/Edit page for a new or existing participation record
   };
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ padding: 3, backgroundColor: '#ffffff', borderRadius: '10px' }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: '#333' }}>
-          Participation Data View
-        </Typography>
-
-        {/* Add/Edit Button */}
-        <Box sx={{ marginBottom: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleAddOrEditClick}
-            size="small"
-            sx={{ fontWeight: 'bold', borderRadius: '5px' }}
-          >
-            Add Participation
-          </Button>
-        </Box>
-
-        {/* Search Box */}
-        <TextField
-          label="Search"
-          variant="outlined"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          fullWidth
-          sx={{ marginBottom: 2 }}
-          InputProps={{
-            startAdornment: <InputAdornment position="start">🔍</InputAdornment>,
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: '#1D2B64', // Gradient background
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 4,
+      }}
+    >
+      <Container maxWidth="lg">
+        <Box
+          sx={{
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            padding: 4,
           }}
-        />
+        >
+          <Typography variant="h5" gutterBottom>
+            Participation Data View
+          </Typography>
 
-        {/* Sort Dropdown */}
-        <FormControl fullWidth sx={{ marginBottom: 2 }}>
-          <InputLabel>Sort By</InputLabel>
-          <Select
-            value={sortColumn}
-            onChange={(e) => handleSortChange(e.target.value)}
-            label="Sort By"
-          >
-            <MenuItem value="title">Title</MenuItem>
-            <MenuItem value="organization">Organization</MenuItem>
-            <MenuItem value="date">Date</MenuItem>
-            <MenuItem value="eventType">Event Type</MenuItem>
-          </Select>
-        </FormControl>
+          {/* Add/Edit Button */}
+          <Box sx={{ marginBottom: 2 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={handleAddOrEditClick}
+              sx={{ fontWeight: 'bold', borderRadius: '5px' }}
+            >
+              Add Participation
+            </Button>
+          </Box>
 
-        {/* Table */}
-        <TableContainer component={Paper} ref={printRef} sx={{ borderRadius: '8px' }}>
-          <Table>
-            <TableHead sx={{ backgroundColor: '#1976d2', color: '#fff' }}>
-              <TableRow>
-                <TableCell sx={{ color: '#fff' }}>Sr. No.</TableCell>
-                <TableCell>
-                  <Button onClick={() => handleSortChange('eventType')} sx={{ color: '#fff' }}>
-                    Event Type
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <Button onClick={() => handleSortChange('title')} sx={{ color: '#fff' }}>
-                    Title
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <Button onClick={() => handleSortChange('organization')} sx={{ color: '#fff' }}>
-                    Organization
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <Button onClick={() => handleSortChange('level')} sx={{ color: '#fff' }}>
-                    Level
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <Button onClick={() => handleSortChange('date')} sx={{ color: '#fff' }}>
-                    Date
-                  </Button>
-                </TableCell>
-                <TableCell>Details</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {sortedData.map((entry, index) => (
-                <TableRow key={entry.id}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{entry.eventType}</TableCell>
-                  <TableCell>{entry.title}</TableCell>
-                  <TableCell>{entry.organization}</TableCell>
-                  <TableCell>{entry.level}</TableCell>
-                  <TableCell>{entry.date}</TableCell>
-                  <TableCell>{entry.details}</TableCell>
-                  <TableCell>
-                    <Stack direction="row" spacing={1}>
-                      <IconButton color="primary" onClick={() => onEdit(entry)}>
-                        <Edit />
-                      </IconButton>
-                      <IconButton color="secondary" onClick={() => onDelete(entry.id)}>
-                        <Delete />
-                      </IconButton>
-                    </Stack>
-                  </TableCell>
+          {/* Search Bar */}
+          <TextField
+            label="Search"
+            variant="outlined"
+            fullWidth
+            value={searchTerm}
+            onChange={handleSearchChange}
+            sx={{ marginBottom: 2 }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start">🔍</InputAdornment>,
+            }}
+          />
+
+          {/* Sort Dropdown */}
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+            <InputLabel>Sort By</InputLabel>
+            <Select
+              value={sortColumn}
+              onChange={(e) => handleSortChange(e.target.value)}
+              label="Sort By"
+            >
+              <MenuItem value="title">Title</MenuItem>
+              <MenuItem value="organization">Organization</MenuItem>
+              <MenuItem value="date">Date</MenuItem>
+              <MenuItem value="eventType">Event Type</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Data Table */}
+          <TableContainer component={Paper} ref={printRef} sx={{ marginBottom: 2 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Sr. No.</TableCell>
+                  <TableCell>Event Type</TableCell>
+                  <TableCell>Title</TableCell>
+                  <TableCell>Organization</TableCell>
+                  <TableCell>Level</TableCell>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Details</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {sortedData.length > 0 ? (
+                  sortedData.map((entry, index) => (
+                    <TableRow
+                      key={entry.id}
+                      sx={{
+                        '&:nth-of-type(odd)': { backgroundColor: '#f9f9f9' },
+                        '&:hover': { backgroundColor: '#f1f1f1' },
+                      }}
+                    >
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{entry.eventType}</TableCell>
+                      <TableCell>{entry.title}</TableCell>
+                      <TableCell>{entry.organization}</TableCell>
+                      <TableCell>{entry.level}</TableCell>
+                      <TableCell>{entry.date}</TableCell>
+                      <TableCell>{entry.details}</TableCell>
+                      <TableCell>
+                        <Stack direction="row" spacing={1}>
+                          <IconButton
+                            size="small"
+                            onClick={() => onEdit(entry)}
+                            sx={{ color: '#1976d2' }}
+                          >
+                            <Edit fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDelete(entry.id)}
+                            sx={{ color: '#d32f2f' }}
+                          >
+                            <Delete fontSize="small" />
+                          </IconButton>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={8} align="center">
+                      No participation records available.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-        {/* Export Buttons */}
-        <Box sx={{ marginTop: 3 }}>
-          <Stack direction="row" spacing={2}>
-            <Button variant="outlined" color="primary">
-              <CSVLink
-                data={sortedData}
-                headers={headers}
-                filename="participation_data.csv"
-                style={{ textDecoration: 'none', color: 'inherit' }}
+          {/* Export Buttons */}
+          <Box sx={{ marginTop: 2 }}>
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                sx={{
+                  '&:hover': { backgroundColor: '#e3f2fd' },
+                  fontWeight: 'bold',
+                  borderRadius: '5px',
+                }}
               >
-                Export to CSV
-              </CSVLink>
-            </Button>
-            <Button variant="outlined" color="secondary" onClick={handleExportPDF}>
-              Export to PDF
-            </Button>
-            <Button variant="outlined" onClick={handlePrint}>
-              Print
-            </Button>
-          </Stack>
+                <CSVLink data={sortedData} headers={headers} filename="participation_data.csv">
+                  Export to CSV
+                </CSVLink>
+              </Button>
+              <Button
+                variant="outlined"
+                color="success"
+                size="small"
+                sx={{
+                  '&:hover': { backgroundColor: '#e8f5e9' },
+                  fontWeight: 'bold',
+                  borderRadius: '5px',
+                }}
+                onClick={handleExportPDF}
+              >
+                Export to PDF
+              </Button>
+              <Button
+                variant="outlined"
+                color="success"
+                size="small"
+                sx={{
+                  '&:hover': { backgroundColor: '#e8f5e9' },
+                  fontWeight: 'bold',
+                  borderRadius: '5px',
+                }}
+                onClick={handlePrint}
+              >
+                Print
+              </Button>
+            </Stack>
+          </Box>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 }
 

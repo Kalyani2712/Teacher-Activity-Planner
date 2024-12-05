@@ -83,6 +83,19 @@ function Sidebar() {
           </ListItemIcon>
           {open && <ListItemText primary="Teaching Plan" />}
         </ListItem>
+        <ListItem button component={Link} to="/SynopsisView">
+          <ListItemIcon>
+            <LibraryBooks sx={{ color: '#8bc34a' }} />
+          </ListItemIcon>
+          {open && <ListItemText primary="Teaching Synopsis" />}
+        </ListItem>
+
+        <ListItem button component={Link} to="/LectureDetailsView">
+          <ListItemIcon>
+            <LibraryBooks sx={{ color: '#8bc34a' }} />
+          </ListItemIcon>
+          {open && <ListItemText primary="Lecture Details" />}
+        </ListItem>
 
         <ListItem button component={Link} to="/SyllabusCompletionView">
           <ListItemIcon>

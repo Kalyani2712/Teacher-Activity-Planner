@@ -1,32 +1,32 @@
 import React, { useEffect, useState, useRef } from 'react';
 import {
   Container,
-  Box,
   Typography,
+  Box,
+  Paper,
+  TableContainer,
   Table,
   TableHead,
   TableRow,
   TableCell,
   TableBody,
-  Button,
-  TableContainer,
-  Paper,
   IconButton,
+  Button,
   Stack,
   TextField,
   InputAdornment,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  TablePagination,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
-import { Edit, Delete, ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import { Edit, Delete } from '@mui/icons-material';
 import { CSVLink } from 'react-csv';
-import { jsPDF } from 'jspdf';
 import { useReactToPrint } from 'react-to-print';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify'; // Notification for success
 
 const headers = [
   { label: 'Teacher Name', key: 'teacherName' },
@@ -41,50 +41,26 @@ const headers = [
   { label: 'No. of Supervisions', key: 'noOfSupervisions' },
 ];
 
-function CentralAssessmentView() {
-  const location = useLocation();
-  const { formData } = location.state || {};
-  const navigate = useNavigate();
-  const [data, setData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortColumn, setSortColumn] = useState('teacherName');
-  const [sortDirection, setSortDirection] = useState('asc');
-  const [currentPage, setCurrentPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deleteIndex, setDeleteIndex] = useState(null);
+function CentralAssessmentView({ data = [], onDelete, onEdit }) {
   const printRef = useRef();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (Array.isArray(formData)) {
-      setData(formData);
-    } else if (formData) {
-      setData([formData]);
-    }
-  }, [formData]);
+  // States for sorting, search, and filtered data
+  const [sortedData, setSortedData] = useState(data);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('asc');
 
+  // Print functionality
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
   });
 
+  // Export to PDF
   const handleExportPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [
-        [
-          'Teacher Name',
-          'Examination Name',
-          'Class',
-          'Sub/Course',
-          'Total Sets',
-          'Translation Required',
-          'Start Date',
-          'Last Date',
-          'Total Answer Books Assessed',
-          'No. of Supervisions',
-        ],
-      ],
-      body: data.map((item) => [
+      head: [['Teacher Name', 'Examination Name', 'Class', 'Sub/Course', 'Total Sets', 'Translation Required', 'Start Date', 'Last Date', 'Total Answer Books Assessed', 'No. of Supervisions']],
+      body: sortedData.map((item) => [
         item.teacherName,
         item.examinationName,
         item.class,
@@ -96,173 +72,228 @@ function CentralAssessmentView() {
         item.totalAnswerBooksAssessed,
         item.noOfSupervisions,
       ]),
+      styles: { halign: 'center' },
     });
     doc.save('central_assessment_data.pdf');
   };
 
+  // Edit button click handler (from table)
+  const handleEdit = (entry) => {
+    onEdit(entry); // Pass data to parent component for editing
+    navigate('/CentralAssessmentEdit'); // Navigate to the edit page
+  };
+
+  // Search filter handler
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+    const query = e.target.value.toLowerCase();
+    setSearchTerm(query);
+    setSortedData(
+      data.filter(
+        (item) =>
+          item.teacherName.toLowerCase().includes(query) ||
+          item.examinationName.toLowerCase().includes(query)
+      )
+    );
   };
 
-  const filteredData = data.filter(
-    (item) =>
-      item.teacherName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.examinationName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.class.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleSortChange = (column) => {
-    const isAscending = sortColumn === column && sortDirection === 'asc';
-    setSortColumn(column);
-    setSortDirection(isAscending ? 'desc' : 'asc');
+  // Sorting functionality
+  const handleSortChange = (e) => {
+    const order = e.target.value;
+    setSortOrder(order);
+    const sorted = [...sortedData].sort((a, b) => {
+      if (order === 'asc') {
+        return a.teacherName.localeCompare(b.teacherName);
+      } else {
+        return b.teacherName.localeCompare(a.teacherName);
+      }
+    });
+    setSortedData(sorted);
   };
 
-  const sortedData = filteredData.sort((a, b) => {
-    if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
-    if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
-    return 0;
-  });
-
-  const paginatedData = sortedData.slice(
-    currentPage * rowsPerPage,
-    currentPage * rowsPerPage + rowsPerPage
-  );
-
-  const handleDeleteDialogOpen = (index) => {
-    setDeleteDialogOpen(true);
-    setDeleteIndex(index);
-  };
-
-  const handleDeleteDialogClose = () => {
-    setDeleteDialogOpen(false);
-    setDeleteIndex(null);
-  };
-
-  const handleDelete = () => {
-    const updatedData = [...data];
-    updatedData.splice(deleteIndex, 1);
-    setData(updatedData);
-    handleDeleteDialogClose();
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setCurrentPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(0);
+  // Handle delete
+  const handleDelete = (id) => {
+    onDelete(id); // Delete record from parent component
+    toast.success('Record deleted successfully!'); // Notify success
   };
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ padding: 3, backgroundColor: '#1D2B64', borderRadius: '10px' }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: '#fff' }}>
-          Central Assessment Data View
-        </Typography>
-        <Stack direction="row" spacing={2} sx={{ marginBottom: 2 }}>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={() => navigate('/CentralAssessment')}
-            sx={{ fontWeight: 'bold' }}
-          >
-            Add New Entry
-          </Button>
-          <CSVLink data={data} headers={headers} filename="central_assessment_data.csv">
-            <Button variant="outlined" sx={{ fontWeight: 'bold' }}>
-              Export CSV
-            </Button>
-          </CSVLink>
-          <Button variant="outlined" onClick={handleExportPDF} sx={{ fontWeight: 'bold' }}>
-            Export PDF
-          </Button>
-          <Button variant="outlined" onClick={handlePrint} sx={{ fontWeight: 'bold' }}>
-            Print
-          </Button>
-        </Stack>
-        <TextField
-          label="Search"
-          fullWidth
-          value={searchTerm}
-          onChange={handleSearchChange}
-          InputProps={{
-            startAdornment: <InputAdornment position="start">🔍</InputAdornment>,
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: '#1D2B64', // Gradient background
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 4,
+      }}
+    >
+      <Container maxWidth="lg">
+        <Box
+          sx={{
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            padding: 4,
           }}
-          sx={{ marginBottom: 2 }}
-        />
-        <TableContainer component={Paper} ref={printRef} sx={{ boxShadow: 3 }}>
-          <Table>
-            <TableHead sx={{ backgroundColor: '#1976d2', color: '#fff' }}>
-              <TableRow>
-                <TableCell>Sr. No.</TableCell>
-                {headers.map(({ label, key }) => (
-                  <TableCell key={key}>
-                    <Button
-                      onClick={() => handleSortChange(key)}
-                      sx={{ color: '#fff', textTransform: 'none' }}
-                      endIcon={
-                        sortColumn === key ? (
-                          sortDirection === 'asc' ? (
-                            <ArrowUpward />
-                          ) : (
-                            <ArrowDownward />
-                          )
-                        ) : null
-                      }
-                    >
-                      {label}
-                    </Button>
-                  </TableCell>
-                ))}
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedData.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell>{currentPage * rowsPerPage + index + 1}</TableCell>
-                  {headers.map(({ key }) => (
-                    <TableCell key={key}>{item[key]}</TableCell>
-                  ))}
-                  <TableCell>
-                    <IconButton onClick={() => handleDeleteDialogOpen(index)} color="error">
-                      <Delete />
-                    </IconButton>
-                    <IconButton onClick={() => navigate(`/edit/${index}`)} color="primary">
-                      <Edit />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          component="div"
-          count={filteredData.length}
-          page={currentPage}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Box>
+        >
+          <Typography variant="h5" gutterBottom>
+            Central Assessment Records View
+          </Typography>
 
-      <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
-        <DialogTitle>Delete Entry</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this entry? This action cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteDialogClose}>Cancel</Button>
-          <Button onClick={handleDelete} color="error">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+          {/* Add/Edit Button */}
+          <Box sx={{ marginBottom: 2 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={() => navigate('/CentralAssessment')}
+              sx={{ fontWeight: 'bold', borderRadius: '5px' }}
+            >
+              Add New Entry
+            </Button>
+          </Box>
+
+          {/* Search Bar */}
+          <TextField
+            label="Search"
+            variant="outlined"
+            fullWidth
+            value={searchTerm}
+            onChange={handleSearchChange}
+            sx={{ marginBottom: 2 }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start">🔍</InputAdornment>,
+            }}
+          />
+
+          {/* Sort Dropdown */}
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+            <InputLabel>Sort By</InputLabel>
+            <Select value={sortOrder} onChange={handleSortChange} label="Sort By">
+              <MenuItem value="asc">Ascending</MenuItem>
+              <MenuItem value="desc">Descending</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Data Table */}
+          <TableContainer component={Paper} ref={printRef} sx={{ marginBottom: 2 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Sr. No.</TableCell>
+                  <TableCell>Teacher Name</TableCell>
+                  <TableCell>Examination Name</TableCell>
+                  <TableCell>Class</TableCell>
+                  <TableCell>Sub/Course</TableCell>
+                  <TableCell>Total Sets</TableCell>
+                  <TableCell>Translation Required</TableCell>
+                  <TableCell>Start Date</TableCell>
+                  <TableCell>Last Date</TableCell>
+                  <TableCell>Total Answer Books Assessed</TableCell>
+                  <TableCell>No. of Supervisions</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {sortedData.length > 0 ? (
+                  sortedData.map((entry, index) => (
+                    <TableRow
+                      key={entry.id}
+                      sx={{
+                        '&:nth-of-type(odd)': { backgroundColor: '#f9f9f9' },
+                        '&:hover': { backgroundColor: '#f1f1f1' },
+                      }}
+                    >
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{entry.teacherName}</TableCell>
+                      <TableCell>{entry.examinationName}</TableCell>
+                      <TableCell>{entry.class}</TableCell>
+                      <TableCell>{entry.subCourse}</TableCell>
+                      <TableCell>{entry.totalSets}</TableCell>
+                      <TableCell>{entry.translation}</TableCell>
+                      <TableCell>{entry.startDate}</TableCell>
+                      <TableCell>{entry.lastDate}</TableCell>
+                      <TableCell>{entry.totalAnswerBooksAssessed}</TableCell>
+                      <TableCell>{entry.noOfSupervisions}</TableCell>
+                      <TableCell>
+                        <Stack direction="row" spacing={1}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEdit(entry)}
+                            sx={{ color: '#1976d2' }}
+                          >
+                            <Edit fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDelete(entry.id)}
+                            sx={{ color: '#d32f2f' }}
+                          >
+                            <Delete fontSize="small" />
+                          </IconButton>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={12} align="center">
+                      No records available.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          {/* Export Buttons */}
+          <Box sx={{ marginTop: 2 }}>
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                sx={{
+                  '&:hover': { backgroundColor: '#e3f2fd' },
+                  fontWeight: 'bold',
+                  borderRadius: '5px',
+                }}
+              >
+                <CSVLink data={sortedData} headers={headers} filename="central_assessment_data.csv">
+                  Export to CSV
+                </CSVLink>
+              </Button>
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                sx={{
+                  '&:hover': { backgroundColor: '#e3f2fd' },
+                  fontWeight: 'bold',
+                  borderRadius: '5px',
+                }}
+                onClick={handleExportPDF}
+              >
+                Export to PDF
+              </Button>
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                sx={{
+                  '&:hover': { backgroundColor: '#e3f2fd' },
+                  fontWeight: 'bold',
+                  borderRadius: '5px',
+                }}
+                onClick={handlePrint}
+              >
+                Print
+              </Button>
+            </Stack>
+          </Box>
+        </Box>
+      </Container>
+    </Box>
   );
 }
 
