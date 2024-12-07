@@ -71,7 +71,7 @@ function Dashboard() {
       <Box sx={{ width: '100%', padding: 2, backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: 3 }}>
         <Container maxWidth="lg">
           <Box sx={{ padding: 3 }}>
-            <Typography variant="h4" gutterBottom sx={{ color: '#ff4081', fontFamily: 'Comic Sans MS', fontWeight: 'bold' }}>
+            <Typography variant="h4" gutterBottom sx={{ color: '#ff4081', fontFamily: '', fontWeight: 'bold' }}>
               Teacher Dashboard
             </Typography>
 
@@ -180,7 +180,7 @@ function Dashboard() {
               </Grid>
 
               {/* Report 2 */}
-              <Grid item xs={12} sm={6} md={4}>
+              {/* <Grid item xs={12} sm={6} md={4}>
                 <Card sx={{ backgroundColor: '#f1f8e9', boxShadow: 6, borderRadius: '12px', padding: 2 }}>
                   <CardContent>
                     <Typography variant="h6" sx={{ fontSize: '1.2rem', color: '#388e3c' }}>Leave Analysis</Typography>
@@ -196,7 +196,7 @@ function Dashboard() {
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>
-              </Grid>
+              </Grid> */}
 
               {/* Report 3 */}
               <Grid item xs={12} sm={6} md={4}>

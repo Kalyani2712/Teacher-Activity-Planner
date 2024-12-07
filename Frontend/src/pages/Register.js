@@ -31,6 +31,7 @@ function TeacherRegistration() {
     department: '',
     dateOfBirth: '',
     email: '',
+    contactNumber: '',
     residentialAddress: '',
     permanentAddress: '',
   });
@@ -98,6 +99,7 @@ function TeacherRegistration() {
       department: '',
       dateOfBirth: '',
       email: '',
+      contactNumber: '',
       residentialAddress: '',
       permanentAddress: '',
     });
@@ -241,6 +243,18 @@ function TeacherRegistration() {
                   onChange={handleChange}
                   error={!!errors.email}
                   helperText={errors.email}
+                  sx={{ backgroundColor: '#f9f9f9' }}
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Contact No"
+                  variant="outlined"
+                  name="contactNumber"
+                  value={formData.contactNumber}
+                  onChange={handleChange}
                   sx={{ backgroundColor: '#f9f9f9' }}
                 />
               </Grid>

@@ -16,7 +16,7 @@ exports.seed = async function(knex) {
       faculty: "Science",
       department: "Computer Science",
       DOB: "01/01/2000",
-      phoneNo: "[1234567890, 9876543210]",
+      phoneNo: "1234567890",
       res_address: "Some place, Some city, Some state, Some country",
       per_address: "Some place, Some city, Some state, Some country"
     }
