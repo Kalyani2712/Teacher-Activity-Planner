@@ -1,6 +1,3 @@
-const { select } = require("../sql/dbConfig");
-const { trace } = require("./server");
-
 const isEmptyObject = (obj) => {
     return JSON.stringify(obj) === '{}';
 };

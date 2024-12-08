@@ -96,12 +96,13 @@ function Sidebar() {
           </ListItemIcon>
           {open && <ListItemText primary="Teaching Plan" />}
         </ListItem>
-        <ListItem button component={Link} to="/SynopsisView">
+        
+        {/* <ListItem button component={Link} to="/SynopsisView">
           <ListItemIcon>
             <LibraryBooks sx={{ color: '#8bc34a' }} />
           </ListItemIcon>
           {open && <ListItemText primary="Teaching Synopsis" />}
-        </ListItem>
+        </ListItem> */}
 
         <ListItem button component={Link} to="/LectureDetailsView">
           <ListItemIcon>
@@ -151,12 +152,12 @@ function Sidebar() {
           {open && <ListItemText primary="Participation" />}
         </ListItem>
 
-        <ListItem button component={Link} to="/PublicationsView">
+        {/* <ListItem button component={Link} to="/PublicationsView">
           <ListItemIcon>
             <LibraryBooks sx={{ color: '#673ab7' }} />
           </ListItemIcon>
           {open && <ListItemText primary="Publications" />}
-        </ListItem>
+        </ListItem> */}
 
         <ListItem button component={Link} to="/ResearchPublicationsView">
           <ListItemIcon>

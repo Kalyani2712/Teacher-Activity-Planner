@@ -13,9 +13,11 @@ import {
   Divider,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-function TeachingPlanEntry() {
+function TeachingPlanEntry({month, year, className, semester}) {
   const [formData, setFormData] = useState({
+    t_id : localStorage.getItem('id'),
     year: '',
     class: '',
     month: '',
@@ -24,12 +26,24 @@ function TeachingPlanEntry() {
     availablePeriod: '',
     title: '',
     paperNo: '',
-    lectureDetails: [
+    lectureDetails: JSON.stringify([
       { lecNo: '', topic: '', subTopic: '', plannedDate: '', actualDate: '', remark: '' },
-    ],
+      { lecNo: '', topic: '', subTopic: '', plannedDate: '', actualDate: '', remark: '' }
+    ]),
   });
-
   const navigate = useNavigate();
+  console.log(month, year, className, semester);
+  useState(() => {
+    
+    axios.put('http://localhost:5000/lectures/'+localStorage.getItem('id'), {month: month, year: year, className: className, semester: semester}).then((response) => {
+      if (response.data.length !== 0) {
+        setFormData(response.data[0]);
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,27 +54,35 @@ function TeachingPlanEntry() {
     const { name, value } = e.target;
     const updatedLectures = [...formData.lectureDetails];
     updatedLectures[index][name] = value;
-    setFormData({ ...formData, lectureDetails: updatedLectures });
+    setFormData({ ...formData, lectureDetails: JSON.stringify(updatedLectures) });
   };
 
   const addLectureDetail = () => {
+    const lectureDetailsTemp = JSON.parse(formData.lectureDetails);
+    lectureDetailsTemp.push({
+      lecNo: '',
+      topic: '',
+      subTopic: '',
+      plannedDate: '',
+      actualDate: '',
+      remark: ''
+    });
     setFormData({
       ...formData,
-      lectureDetails: [
-        ...formData.lectureDetails,
-        { lecNo: '', topic: '', subTopic: '', plannedDate: '', actualDate: '', remark: '' },
-      ],
+      lectureDetails: JSON.stringify(lectureDetailsTemp)
     });
   };
 
   const removeLectureDetail = (index) => {
-    const updatedLectures = formData.lectureDetails.filter((_, idx) => idx !== index);
-    setFormData({ ...formData, lectureDetails: updatedLectures });
+    const updatedLectures = JSON.parse(formData.lectureDetails).filter((_, idx) => idx !== index);
+    setFormData({ ...formData, lectureDetails: JSON.stringify(updatedLectures) });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Teaching Plan Data:', formData);
+    axios.post('http://localhost:5000/lectures', formData).catch((error) => {
+      console.log(error);
+    });
     navigate('/TeachingPlanView');
   };
 
@@ -103,7 +125,7 @@ function TeachingPlanEntry() {
                   name="year"
                   value={formData.year}
                   onChange={handleChange}
-                  type="date"
+                  type="TextField"
                   InputLabelProps={{ shrink: true }}
                   sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
                 />
@@ -127,6 +149,15 @@ function TeachingPlanEntry() {
                     <MenuItem value="January">January</MenuItem>
                     <MenuItem value="February">February</MenuItem>
                     <MenuItem value="March">March</MenuItem>
+                    <MenuItem value="April">April</MenuItem>
+                    <MenuItem value="May">May</MenuItem>
+                    <MenuItem value="June">June</MenuItem>
+                    <MenuItem value="July">July</MenuItem>
+                    <MenuItem value="August">August</MenuItem>
+                    <MenuItem value="September">September</MenuItem>
+                    <MenuItem value="October">October</MenuItem>
+                    <MenuItem value="November">November</MenuItem>
+                    <MenuItem value="December">December</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -135,8 +166,12 @@ function TeachingPlanEntry() {
                 <FormControl fullWidth sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}>
                   <InputLabel>Semester</InputLabel>
                   <Select name="semester" value={formData.semester} onChange={handleChange}>
-                    <MenuItem value="Semester 1">Semester 1</MenuItem>
-                    <MenuItem value="Semester 2">Semester 2</MenuItem>
+                  <MenuItem value="Semester 1">Semester 1</MenuItem>
+                  <MenuItem value="Semester 2">Semester 2</MenuItem>
+                  <MenuItem value="Semester 3">Semester 3</MenuItem>
+                  <MenuItem value="Semester 4">Semester 4</MenuItem>
+                  <MenuItem value="Semester 5">Semester 5</MenuItem>
+                  <MenuItem value="Semester 6">Semester 6</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -199,36 +234,34 @@ function TeachingPlanEntry() {
               Lecture Details
             </Typography>
 
-            {formData.lectureDetails.map((lec, index) => (
-              <Grid container key={index} spacing={2}>
+            {JSON.parse(formData.lectureDetails).map((lec, index) => (
+                            
+              <><Divider sx={{ marginTop: 2, marginBottom: 2 }} /><Grid container key={index} spacing={2}>
                 <Grid item xs={2}>
                   <TextField
                     label="Lec No"
                     name="lecNo"
                     value={lec.lecNo}
                     onChange={(e) => handleLectureDetailChange(index, e)}
-                    sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
-                  />
+                    sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }} />
                 </Grid>
 
-                <Grid item xs={3}>
+                <Grid item xs={30}>
                   <TextField
                     label="Topic"
                     name="topic"
                     value={lec.topic}
                     onChange={(e) => handleLectureDetailChange(index, e)}
-                    sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
-                  />
+                    sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }} />
                 </Grid>
 
-                <Grid item xs={3}>
+                <Grid item xs={30}>
                   <TextField
                     label="Subtopic"
                     name="subTopic"
                     value={lec.subTopic}
                     onChange={(e) => handleLectureDetailChange(index, e)}
-                    sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
-                  />
+                    sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }} />
                 </Grid>
 
                 <Grid item xs={2}>
@@ -239,30 +272,18 @@ function TeachingPlanEntry() {
                     value={lec.plannedDate}
                     onChange={(e) => handleLectureDetailChange(index, e)}
                     InputLabelProps={{ shrink: true }}
-                    sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
-                  />
+                    sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }} />
                 </Grid>
 
                 <Grid item xs={12}>
                   <TextField
-                    type="date"
+                    type="text"
                     label="Actual Date"
                     name="actualDate"
                     value={lec.actualDate}
                     onChange={(e) => handleLectureDetailChange(index, e)}
                     InputLabelProps={{ shrink: true }}
-                    sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
-                  />
-                </Grid>
-
-                <Grid item xs={13}>
-                  <TextField
-                    label="Remark"
-                    name="remark"
-                    value={lec.remark}
-                    onChange={(e) => handleLectureDetailChange(index, e)}
-                    sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}
-                  />
+                    sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }} />
                 </Grid>
 
                 <Grid item xs={12}>
@@ -276,7 +297,7 @@ function TeachingPlanEntry() {
                   </Button>
                 </Grid>
                 <Divider sx={{ marginTop: 2, marginBottom: 2 }} />
-              </Grid>
+              </Grid></>
             ))}
 
             <Button

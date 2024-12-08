@@ -1,3 +1,5 @@
+const { json } = require("express");
+
 /**
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> } 
@@ -19,6 +21,38 @@ exports.seed = async function(knex) {
       phoneNo: "1234567890",
       res_address: "Some place, Some city, Some state, Some country",
       per_address: "Some place, Some city, Some state, Some country"
+    }
+  ]);
+  await knex('teaching_plan').truncate()
+  await knex('teaching_plan').insert([
+    {
+      t_id: 1733062607989,
+      year: "2023",
+      month: "January",
+      semester: 'Semester 1',
+      class: "FY",
+      course: "Course 1",
+      availablePeriod: '7',
+      title: "Title 1",
+      paperNo: 1,
+      lectureDetails: JSON.stringify([
+        {
+          lecNo: "Lecture 1",
+          topic: "Topic 1",
+          subTopic: "Sub Topic 1",
+          plannedDate: "2023-01-01",
+          actualDate: "2023-01-01",
+          remark: true
+        },
+        {
+          lecNo: "Lecture 2",
+          topic: "Topic 2",
+          subTopic: "Sub Topic 2",
+          plannedDate: "2023-01-02",
+          actualDate: "",
+          remark: false
+        }
+      ])
     }
   ]);
 };

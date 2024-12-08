@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Container,
   Typography,
@@ -19,6 +19,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Grid
 } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import { CSVLink } from 'react-csv';
@@ -28,23 +29,40 @@ import 'jspdf-autotable'; // Required for PDF export
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify'; // Notification for success
-
+import axios from 'axios';
 const headers = [
-  { label: 'Year', key: 'year' },
-  { label: 'Class', key: 'class' },
-  { label: 'Course', key: 'course' },
-  { label: 'Topics Allocated', key: 'topicsAllocated' },
+  { label: 'Lecture No', key: 'lecNo' },
+  { label: 'Topic', key: 'topic' },
+  { label: 'Sub-Topic', key: 'subTopic' },
+  { label: 'Actual Date', key: 'actualDate' },
   { label: 'Planned Date', key: 'plannedDate' },
 ];
 
-function TeachingPlanView({ data, onDelete, onEdit }) {
+
+function TeachingPlanView({ month, year, className, semester, setMonth, setYear, setClassName, setSemester,
+  onDelete, onEdit }) {
   const printRef = useRef();
   const navigate = useNavigate();
 
   // States for sorting, search, and filtered data
-  const [sortedData, setSortedData] = useState(data);
+  const [sortedData, setSortedData] = useState([]);
+  const [newData, setNewData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
+
+
+  useEffect(() => {
+    axios.put('http://localhost:5000/lectures/'+localStorage.getItem('id'), {month: month, year: year, className: className, semester: semester}).then((response) => {
+      setNewData(response.data);
+      setSortedData(JSON.parse(response.data[0].lectureDetails));
+      console.log(newData);
+      console.log(response.data);
+    }).catch((error) => {
+      setSortedData([]);
+      console.log(month, year, className, semester);
+      console.log(error);
+    });
+  }, [month, year, className, semester]);
 
   // Print functionality
   const handlePrint = useReactToPrint({
@@ -55,13 +73,13 @@ function TeachingPlanView({ data, onDelete, onEdit }) {
   const handleExportPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['Year', 'Class', 'Course', 'Topics Allocated', 'Planned Date']],
+      head: [['Lecture No', 'Topic', 'Sub-Topic', 'Planned Date', 'Actual Date']],
       body: sortedData.map((item) => [
-        item.year,
-        item.class,
-        item.course,
-        item.topicsAllocated,
+        item.lecNo,
+        item.topic,
+        item.subTopic,
         item.plannedDate,
+        item.actualDate
       ]),
       styles: { halign: 'center' },
     });
@@ -79,11 +97,11 @@ function TeachingPlanView({ data, onDelete, onEdit }) {
     const query = e.target.value.toLowerCase();
     setSearchTerm(query);
     setSortedData(
-      data.filter(
+      JSON.parse(newData[0].lectureDetails).filter(
         (item) =>
-          item.year.toLowerCase().includes(query) ||
-          item.class.toLowerCase().includes(query) ||
-          item.course.toLowerCase().includes(query)
+          item.subTopic.toLowerCase().includes(query) ||
+          item.plannedDate.toLowerCase().includes(query) ||
+          item.lecNo.toLowerCase().includes(query)
       )
     );
   };
@@ -102,11 +120,7 @@ function TeachingPlanView({ data, onDelete, onEdit }) {
     setSortedData(sorted);
   };
 
-  // Handle delete
-  const handleDelete = (id) => {
-    onDelete(id); // Delete record from parent component
-    toast.success('Record deleted successfully!'); // Notify success
-  };
+
 
   // Navigate to Add/Edit page
   const handleAddOrEditClick = () => {
@@ -165,6 +179,77 @@ function TeachingPlanView({ data, onDelete, onEdit }) {
             }}
           />
 
+          {/* add month, year, class, semester filter in grid the input will be text*/}
+          <Grid container spacing={2} sx={{ marginBottom: 2 }}>
+            <Grid item xs={6}>
+              <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                <InputLabel id="month-label">Month</InputLabel>
+                <Select
+                  labelId="month-label"
+                  value={month}
+                  label="Month"
+                  onChange={(e) => setMonth(e.target.value)}
+                >
+                  <MenuItem value="January">January</MenuItem>
+                  <MenuItem value="February">February</MenuItem>
+                  <MenuItem value="March">March</MenuItem>
+                  <MenuItem value="April">April</MenuItem>
+                  <MenuItem value="May">May</MenuItem>
+                  <MenuItem value="June">June</MenuItem>
+                  <MenuItem value="July">July</MenuItem>
+                  <MenuItem value="August">August</MenuItem>
+                  <MenuItem value="September">September</MenuItem>
+                  <MenuItem value="October">October</MenuItem>
+                  <MenuItem value="November">November</MenuItem>
+                  <MenuItem value="December">December</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Year"
+                variant="outlined"
+                fullWidth
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                sx={{ marginBottom: 2 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                <InputLabel>Class</InputLabel>
+                <Select
+                  labelId="class-label"
+                  value={className}
+                  label="Class"
+                  onChange={(e) => setClassName(e.target.value)}
+                >
+                  <MenuItem value="FY">FY</MenuItem>
+                  <MenuItem value="SY">SY</MenuItem>
+                  <MenuItem value="TY">TY</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                <InputLabel>Semester</InputLabel>
+                <Select
+                  labelId="semester-label"
+                  value={semester}
+                  label="Semester"
+                  onChange={(e) => setSemester(e.target.value)}
+                >
+                  <MenuItem value="Semester 1">Semester 1</MenuItem>
+                  <MenuItem value="Semester 2">Semester 2</MenuItem>
+                  <MenuItem value="Semester 3">Semester 3</MenuItem>
+                  <MenuItem value="Semester 4">Semester 4</MenuItem>
+                  <MenuItem value="Semester 5">Semester 5</MenuItem>
+                  <MenuItem value="Semester 6">Semester 6</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+
           {/* Sort Dropdown */}
           <FormControl fullWidth sx={{ marginBottom: 2 }}>
             <InputLabel>Sort By Year</InputLabel>
@@ -174,16 +259,23 @@ function TeachingPlanView({ data, onDelete, onEdit }) {
             </Select>
           </FormControl>
 
+          {/* add a title of the paper and paper no from newdata var */}
+          {newData.length > 0 ? (
+            <Typography variant="h6" gutterBottom>
+              <pre>Course: {newData[0].course}   |  Title: {newData[0].title}   |   Paper No: {newData[0].paperNo}</pre>
+            </Typography>
+          ): null}
+
           {/* Data Table */}
           <TableContainer component={Paper} ref={printRef} sx={{ marginBottom: 2 }}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Year</TableCell>
-                  <TableCell>Class</TableCell>
-                  <TableCell>Course</TableCell>
-                  <TableCell>Topics Allocated</TableCell>
+                  <TableCell>Lecture No</TableCell>
+                  <TableCell>Topic</TableCell>
+                  <TableCell>Sub-Topic</TableCell>
                   <TableCell>Planned Date</TableCell>
+                  <TableCell>Actual Date</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -191,11 +283,11 @@ function TeachingPlanView({ data, onDelete, onEdit }) {
                 {sortedData.length > 0 ? (
                   sortedData.map((entry, index) => (
                     <TableRow key={entry.id}>
-                      <TableCell>{entry.year}</TableCell>
-                      <TableCell>{entry.class}</TableCell>
-                      <TableCell>{entry.course}</TableCell>
-                      <TableCell>{entry.topicsAllocated}</TableCell>
+                      <TableCell>{entry.lecNo}</TableCell>
+                      <TableCell>{entry.topic}</TableCell>
+                      <TableCell>{entry.subTopic}</TableCell>
                       <TableCell>{entry.plannedDate}</TableCell>
+                      <TableCell>{entry.actualDate}</TableCell>
                       <TableCell>
                         <Stack direction="row" spacing={1}>
                           <IconButton
@@ -204,13 +296,6 @@ function TeachingPlanView({ data, onDelete, onEdit }) {
                             sx={{ color: '#1976d2' }}
                           >
                             <Edit fontSize="small" />
-                          </IconButton>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleDelete(entry.id)}
-                            sx={{ color: '#d32f2f' }}
-                          >
-                            <Delete fontSize="small" />
                           </IconButton>
                         </Stack>
                       </TableCell>
@@ -283,20 +368,5 @@ function TeachingPlanView({ data, onDelete, onEdit }) {
     </Box>
   );
 }
-
-TeachingPlanView.propTypes = {
-  data: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      year: PropTypes.string.isRequired,
-      class: PropTypes.string.isRequired,
-      course: PropTypes.string.isRequired,
-      topicsAllocated: PropTypes.string.isRequired,
-      plannedDate: PropTypes.string.isRequired,
-    })
-  ),
-  onDelete: PropTypes.func.isRequired,
-  onEdit: PropTypes.func.isRequired,
-};
 
 export default TeachingPlanView;

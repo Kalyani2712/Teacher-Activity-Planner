@@ -59,6 +59,13 @@ function App() {
   const [moocsData, setMoocsData] = useState([]);
   const [editMoocsData, setEditMoocsData] = useState(null);
 
+
+  const [month, setMonth] = useState('January');
+  const [year, setYear] = useState('2023');
+  const [className, setClassName] = useState('FY');
+  const [semester, setSemester] = useState('Semester 1');
+
+
   // State to handle if user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
@@ -175,6 +182,7 @@ function App() {
           <div style={{ marginLeft: 240, paddingTop: 64 }}> {/* Adjust the marginLeft based on sidebar width */}
             <Routes>
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/" element={<Dashboard />} />
               <Route path="/Profile" element={<Profile/>} />
               {/* Assigned Lectures */}
               <Route path="/assigned-lectures-view" element={<AssignedLecturesView />} />
@@ -211,25 +219,30 @@ function App() {
               <Route
                 path="/TeachingPlan"
                 element={
-                  <TeachingPlan
-                    initialData={editTeachingPlanData}
-                    onSave={(newData) => handleSaveTeachingPlan(newData)}
-                  />
+                  <TeachingPlan month={month} year={year} className={className} semester={semester}/>
                 }
               />
               <Route
                 path="/TeachingPlanView"
                 element={
                   <TeachingPlanView
+                    month={month}
+                    year={year}
+                    className={className}
+                    semester={semester}
                     data={teachingPlanData}
+                    setMonth={setMonth}
+                    setYear={setYear}
+                    setClassName={setClassName}
+                    setSemester={setSemester}
                     onDelete={(id) => handleDeleteTeachingPlan(id)}
                     onEdit={(data) => handleEditTeachingPlan(data)}
                   />
                 }
               /> 
               <Route path="/LectureDetails" element={<LectureDetails/>}/>
-               <Route path="/LectureDetailsView" element={<LectureDetailsView />} />
-               <Route path="/SyllabusReport" element={<SyllabusReport />} />
+              <Route path="/LectureDetailsView" element={<LectureDetailsView />} />
+              <Route path="/SyllabusReport" element={<SyllabusReport />} />
               <Route path="/SyllabusCompletionView" element={<SyllabusCompletionView />} />
               <Route path="/SyllabusReport" element={<SyllabusReport />} />
               <Route path="/SynopsisView" element={<SynopsisView />} />

@@ -9,11 +9,6 @@ function Login({ isLoggedIn, setIsLoggedIn }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  
-  if (isLoggedIn) {
-    window.location.href = '/dashboard';;
-  }
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials({ ...credentials, [name]: value });
