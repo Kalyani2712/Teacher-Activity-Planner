@@ -29,7 +29,9 @@ function LectureDetailsView({ entry_id, setEntry_id, data = [], onDelete, onEdit
   useEffect(() => {
     // setEntry_id(null);
     axios.get('http://localhost:5000/lecturestaken/'+localStorage.getItem('id')).then((res) => {
-      setSortedData(res.data);
+      if(res.status !== 404){
+        setSortedData(res.data);
+      }
     }).catch((error) => {
       console.error('Error fetching data:', error);
     })

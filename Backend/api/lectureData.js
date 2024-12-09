@@ -6,8 +6,8 @@ function LectureData(server, db) {
         try{
             const info = await db('teaching_plan').select();
             if (info.length === 0){
+                console.log(info)
                 res.sendStatus(404);
-                return;
             }
             res.json(info);
         } catch(err){
@@ -21,6 +21,7 @@ function LectureData(server, db) {
         try{
             const info = await db('teaching_plan').select().where('t_id', id);
             if (info.length === 0){
+                console.log(info)
                 res.sendStatus(404);
                 return;
             }
@@ -34,6 +35,7 @@ function LectureData(server, db) {
     server.put('/lectures/:id', async (req, res) => {
         const id = req.params.id;
         const { month, year, className, semester } = req.body;
+        console.log( month, year, className, semester);
         try{
             const info = await db('teaching_plan').select().where('t_id', id)
                 .andWhere('month', month)
@@ -41,6 +43,7 @@ function LectureData(server, db) {
                 .andWhere('class', className)
                 .andWhere('semester', semester);
             if (info.length === 0){
+                console.log(info)
                 res.sendStatus(404);
                 return;
             }

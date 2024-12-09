@@ -32,8 +32,6 @@ const AssignedLecturesView = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [data, setData] = useState([
-    { id: 1, className: 'First Year', courseName: 'Mathematics', totalPeriods: 30, year: '2024-2025' },
-    { id: 2, className: 'Second Year', courseName: 'Physics', totalPeriods: 20, year: '2024-2025' },
   ]);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -41,7 +39,7 @@ const AssignedLecturesView = () => {
   useEffect(() => {
     axios.get('http://localhost:5000/assignedlectures/'+localStorage.getItem('id')).then((response) => {
       setData(response.data);
-    })
+    }).catch((error)=>{console.log(error)})
   }, [location.state, data]);
 
   const handleDelete = (id) => {

@@ -52,7 +52,7 @@ function TeachingPlanEntry({month, year, className, semester}) {
 
   const handleLectureDetailChange = (index, e) => {
     const { name, value } = e.target;
-    const updatedLectures = [...formData.lectureDetails];
+    const updatedLectures = [...JSON.parse(formData.lectureDetails)];
     updatedLectures[index][name] = value;
     setFormData({ ...formData, lectureDetails: JSON.stringify(updatedLectures) });
   };
@@ -275,7 +275,7 @@ function TeachingPlanEntry({month, year, className, semester}) {
                     sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }} />
                 </Grid>
 
-                <Grid item xs={12}>
+                {/* <Grid item xs={12}>
                   <TextField
                     type="text"
                     label="Actual Date"
@@ -284,7 +284,7 @@ function TeachingPlanEntry({month, year, className, semester}) {
                     onChange={(e) => handleLectureDetailChange(index, e)}
                     InputLabelProps={{ shrink: true }}
                     sx={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }} />
-                </Grid>
+                </Grid> */}
 
                 <Grid item xs={12}>
                   <Button

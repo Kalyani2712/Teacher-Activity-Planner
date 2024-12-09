@@ -5,6 +5,7 @@ import axios from 'axios';
 
 const AssignedLectures = () => {
   const [lectureData, setLectureData] = useState({
+    t_id: localStorage.getItem("id"),
     className: '',
     courseName: '',
     theoryPeriods: '',
