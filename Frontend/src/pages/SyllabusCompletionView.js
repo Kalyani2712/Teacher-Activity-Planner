@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Container,
   Typography,
@@ -28,6 +28,7 @@ import 'jspdf-autotable';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify'; // Notification for success
+import axios from 'axios';
 
 const headers = [
   { label: 'Class Name', key: 'className' },
@@ -45,9 +46,24 @@ function SyllabusCompletionView({ data = [], onDelete, onEdit }) {
   const navigate = useNavigate();
 
   // States for sorting, search, and filtered data
-  const [sortedData, setSortedData] = useState(data);
+  const [sortedData, setSortedData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/lectures/'+localStorage.getItem('id')).then((res) => {
+      setSortedData([{
+        className: res.data[0].class,
+        semester: res.data[0].semester,
+        paperNo: res.data[0].paperNo,
+        paperTitle: res.data[0].course,
+        month: res.data[0].month,
+        syllabusPlanned: res.data[0].title,
+        syllabusRemained: null,
+        remark: JSON.parse(res.data[0].lectureDetails).filter((lecture) => lecture.remark !== "completed").length > 0 ? "Not Completed" : "Completed"
+      }]);
+    })
+  }, []);
 
   // Print functionality
   const handlePrint = useReactToPrint({
@@ -143,7 +159,7 @@ function SyllabusCompletionView({ data = [], onDelete, onEdit }) {
           </Typography>
 
           {/* Add/Edit Button */}
-          <Box sx={{ marginBottom: 2 }}>
+          {/* <Box sx={{ marginBottom: 2 }}>
             <Button
               variant="contained"
               color="primary"
@@ -153,7 +169,7 @@ function SyllabusCompletionView({ data = [], onDelete, onEdit }) {
             >
               Add/Edit Syllabus Record
             </Button>
-          </Box>
+          </Box> */}
 
           {/* Search Bar */}
           <TextField
@@ -173,13 +189,13 @@ function SyllabusCompletionView({ data = [], onDelete, onEdit }) {
           />
 
           {/* Sort Dropdown */}
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+          {/* <FormControl fullWidth sx={{ marginBottom: 2 }}>
             <InputLabel>Sort By</InputLabel>
             <Select value={sortOrder} onChange={handleSortChange} label="Sort By">
               <MenuItem value="asc">Ascending</MenuItem>
               <MenuItem value="desc">Descending</MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
 
           {/* Data Table */}
           <TableContainer component={Paper} ref={printRef} sx={{ marginBottom: 2 }}>
@@ -193,7 +209,6 @@ function SyllabusCompletionView({ data = [], onDelete, onEdit }) {
                   <TableCell>Paper Title</TableCell>
                   <TableCell>Month</TableCell>
                   <TableCell>Syllabus Planned</TableCell>
-                  <TableCell>Syllabus Remained</TableCell>
                   <TableCell>Remark</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
@@ -215,7 +230,6 @@ function SyllabusCompletionView({ data = [], onDelete, onEdit }) {
                       <TableCell>{entry.paperTitle}</TableCell>
                       <TableCell>{entry.month}</TableCell>
                       <TableCell>{entry.syllabusPlanned}</TableCell>
-                      <TableCell>{entry.syllabusRemained}</TableCell>
                       <TableCell>{entry.remark}</TableCell>
                       <TableCell>
                         <Stack direction="row" spacing={1}>

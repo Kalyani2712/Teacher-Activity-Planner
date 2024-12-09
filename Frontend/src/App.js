@@ -69,6 +69,7 @@ function App() {
   // State to handle if user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const [entry_id, setEntry_id] = useState(null);
 
  //localStorage.setItem('registeredUsers', JSON.stringify([{user: { email: 'admin', password: 'admin' }, 'isLoggedIn': false}]));
 
@@ -240,8 +241,8 @@ function App() {
                   />
                 }
               /> 
-              <Route path="/LectureDetails" element={<LectureDetails/>}/>
-              <Route path="/LectureDetailsView" element={<LectureDetailsView />} />
+              <Route path="/LectureDetails" element={<LectureDetails entry_id={entry_id} month={month} year={year} className={className}/>}/>
+              <Route path="/LectureDetailsView" element={<LectureDetailsView entry_id={entry_id} setEntry_id={setEntry_id}/>} />
               <Route path="/SyllabusReport" element={<SyllabusReport />} />
               <Route path="/SyllabusCompletionView" element={<SyllabusCompletionView />} />
               <Route path="/SyllabusReport" element={<SyllabusReport />} />

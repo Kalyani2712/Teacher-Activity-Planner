@@ -118,12 +118,13 @@ function Sidebar() {
           {open && <ListItemText primary="Syllabus Completion" />}
         </ListItem>
 
-        <ListItem button component={Link} to="/ActivityReportsView">
+        {/* <ListItem button component={Link} to="/ActivityReportsView">
           <ListItemIcon>
             <LibraryBooks sx={{ color: '#009688' }} />
           </ListItemIcon>
           {open && <ListItemText primary="Activity Reports" />}
-        </ListItem>
+        </ListItem> */}
+
         <ListItem button component={Link} to="/leave-records-view">
           <ListItemIcon>
             <LibraryBooks sx={{ color: '#4caf50' }} />

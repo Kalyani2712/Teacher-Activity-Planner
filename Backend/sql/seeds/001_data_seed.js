@@ -23,6 +23,7 @@ exports.seed = async function(knex) {
       per_address: "Some place, Some city, Some state, Some country"
     }
   ]);
+
   await knex('teaching_plan').truncate()
   await knex('teaching_plan').insert([
     {
@@ -42,7 +43,7 @@ exports.seed = async function(knex) {
           subTopic: "Sub Topic 1",
           plannedDate: "2023-01-01",
           actualDate: "2023-01-01",
-          remark: true
+          remark: "completed"
         },
         {
           lecNo: "Lecture 2",
@@ -50,9 +51,24 @@ exports.seed = async function(knex) {
           subTopic: "Sub Topic 2",
           plannedDate: "2023-01-02",
           actualDate: "",
-          remark: false
+          remark: "pending"
         }
       ])
     }
   ]);
+
+  await knex('lecture_taken').truncate()
+  await knex('lecture_taken').insert([
+    {
+      t_id: 1733062607989,
+      year: "2023",
+      month: "January",
+      date: "2023-01-01",
+      div: "A",
+      class: "FY",
+      time: "9:00 AM - 10:00 AM",
+      lecNo: "Lecture 1",
+      title: "Title 1",
+      module: "Module 1"
+  }]);
 };

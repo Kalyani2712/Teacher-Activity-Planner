@@ -251,13 +251,13 @@ function TeachingPlanView({ month, year, className, semester, setMonth, setYear,
           </Grid>
 
           {/* Sort Dropdown */}
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+          {/* <FormControl fullWidth sx={{ marginBottom: 2 }}>
             <InputLabel>Sort By Year</InputLabel>
             <Select value={sortOrder} onChange={handleSortChange} label="Sort By">
               <MenuItem value="asc">Ascending</MenuItem>
               <MenuItem value="desc">Descending</MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
 
           {/* add a title of the paper and paper no from newdata var */}
           {newData.length > 0 ? (

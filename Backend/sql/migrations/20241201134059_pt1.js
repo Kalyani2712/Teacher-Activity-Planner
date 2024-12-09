@@ -30,6 +30,20 @@ exports.up = async function(knex) {
     table.integer('paperNo');
     table.text('lectureDetails');
   })
+
+  await knex.schema.createTable('lecture_taken', table => {
+    table.integer('t_id')//
+    table.increments('entry_id')//
+    table.string('year');//
+    table.string('month');//
+    table.string('date');
+    table.string('div');
+    table.string('class');
+    table.string('time');
+    table.string('lecNo');//
+    table.string('title');
+    table.text('module');
+  })
 };
 
 /**
@@ -39,4 +53,5 @@ exports.up = async function(knex) {
 exports.down = async function(knex) {
   await knex.schema.dropTableIfExists('teachers');
   await knex.schema.dropTableIfExists('teaching_plan');
+  await knex.schema.dropTableIfExists('lecture_taken');
 };

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Container, Box, Typography, Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Button, Stack, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import { CSVLink } from 'react-csv';
@@ -7,22 +7,33 @@ import { useReactToPrint } from 'react-to-print';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const headers = [
   { label: 'Date', key: 'date' },
+  { label: 'Division', key: 'div' },
   { label: 'Class', key: 'class' },
-  { label: 'Subject', key: 'subject' },
-  { label: 'Lecture Topic', key: 'lectureTopic' },
-  { label: 'Duration', key: 'duration' },
+  { label: 'Subject', key: 'title' },
+  { label: 'Lecture Topic', key: 'module' },
+  { label: 'Duration', key: 'time' },
 ];
 
-function LectureDetailsView({ data = [], onDelete, onEdit }) {
+function LectureDetailsView({ entry_id, setEntry_id, data = [], onDelete, onEdit }) {
   const printRef = useRef();
-  const navigate = useNavigate();
-  const [lectures, setLectures] = useState(data); // Use passed-in data as default state
-  const [sortedData, setSortedData] = useState(data);
+  const navigate = useNavigate(); // Use passed-in data as default state
+  const [sortedData, setSortedData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
+
+
+  useEffect(() => {
+    // setEntry_id(null);
+    axios.get('http://localhost:5000/lecturestaken/'+localStorage.getItem('id')).then((res) => {
+      setSortedData(res.data);
+    }).catch((error) => {
+      console.error('Error fetching data:', error);
+    })
+  }, []);
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -31,31 +42,28 @@ function LectureDetailsView({ data = [], onDelete, onEdit }) {
   const handleExportPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['Date', 'Class', 'Subject', 'Lecture Topic', 'Duration']],
-      body: sortedData.map((item) => [item.date, item.class, item.subject, item.lectureTopic, item.duration]),
+      head: [['Date', 'Division', 'Class', 'Subject', 'Lecture Topic', 'Duration']],
+      body: sortedData.map((item) => [item.date, item.class, item.title, item.module, item.time]),
     });
     doc.save('lecture_details.pdf');
   };
 
   // Delete a lecture
   const handleDelete = (id) => {
-    setLectures(lectures.filter((lecture) => lecture.id !== id));
+    setSortedData(sortedData.filter((lecture) => lecture.id !== id));
     onDelete(id); // Call parent delete handler
   };
 
   // Edit a lecture
   const handleEdit = (updatedLecture) => {
+    setEntry_id(updatedLecture.entry_id);
     navigate('/LectureDetails');
-    setLectures(lectures.map((lecture) =>
-      lecture.id === updatedLecture.id ? updatedLecture : lecture
-    ));
-    onEdit(updatedLecture); // Call parent edit handler
   };
 
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchTerm(query);
-    setSortedData(lectures.filter(item => item.class.toLowerCase().includes(query) || item.subject.toLowerCase().includes(query)));
+    setSortedData(sortedData.filter(item => item.class.toLowerCase().includes(query) || item.title.toLowerCase().includes(query)));
   };
 
   const handleSortChange = (e) => {
@@ -127,19 +135,20 @@ function LectureDetailsView({ data = [], onDelete, onEdit }) {
             }}
           />
 
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+          {/* <FormControl fullWidth sx={{ marginBottom: 2 }}>
             <InputLabel>Sort By</InputLabel>
             <Select value={sortOrder} onChange={handleSortChange} label="Sort By">
               <MenuItem value="asc">Ascending</MenuItem>
               <MenuItem value="desc">Descending</MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
 
           <TableContainer component={Paper} ref={printRef} sx={{ marginBottom: 2 }}>
             <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>Date</TableCell>
+                  <TableCell>Division</TableCell>
                   <TableCell>Class</TableCell>
                   <TableCell>Subject</TableCell>
                   <TableCell>Lecture Topic</TableCell>
@@ -158,10 +167,11 @@ function LectureDetailsView({ data = [], onDelete, onEdit }) {
                       }}
                     >
                       <TableCell>{entry.date}</TableCell>
+                      <TableCell>{entry.div}</TableCell>
                       <TableCell>{entry.class}</TableCell>
-                      <TableCell>{entry.subject}</TableCell>
-                      <TableCell>{entry.lectureTopic}</TableCell>
-                      <TableCell>{entry.duration}</TableCell>
+                      <TableCell>{entry.title}</TableCell>
+                      <TableCell>{entry.module}</TableCell>
+                      <TableCell>{entry.time}</TableCell>
                       <TableCell>
                         <Stack direction="row" spacing={1}>
                           <IconButton
