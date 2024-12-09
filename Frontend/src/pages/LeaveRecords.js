@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Container, Box, Typography, TextField, Grid, Button, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 const LeaveRecordsEntry = ({ onSave }) => {
   const [formData, setFormData] = useState({
+    t_id: localStorage.getItem('id'),
     leaveType: '',
     fromDate: '',
     toDate: '',
@@ -15,7 +17,13 @@ const LeaveRecordsEntry = ({ onSave }) => {
   const navigate = useNavigate();
   const location = useLocation(); // Accessing the data passed via navigate
 
-  const initialData = location.state?.entry; // Retrieve the initial data from state if it exists
+  // useEffect(() => {
+  //   axios.get('http://localhost:5000/leaves/'+localStorage.getItem('id')).then(res => {
+  //     setFormData(res.data[0])
+  //   }).catch(error => {
+  //     console.log(error)
+  //   })
+  // })
 
   // Handle form input changes
   const handleChange = (e) => {
@@ -24,27 +32,31 @@ const LeaveRecordsEntry = ({ onSave }) => {
       ...formData,
       [name]: value,
     });
+
+    console.log(formData);
   };
 
   // Handle form submit
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(formData); // Send formData to parent
+    axios.post('http://localhost:5000/leaves', formData).catch((error) => {
+      console.log(error);
+    })
     navigate('/leave-records-view'); // Redirect to view page after saving
   };
 
   // Load initial data for editing
-  useEffect(() => {
-    if (initialData) {
-      setFormData({
-        leaveType: initialData.leaveType || '',
-        fromDate: initialData.fromDate || '',
-        toDate: initialData.toDate || '',
-        numberOfDays: initialData.numberOfDays || '',
-        reason: initialData.reason || '',
-      });
-    }
-  }, [initialData]);
+  // useEffect(() => {
+  //   if (formData) {
+  //     setFormData({
+  //       leaveType: formData.leaveType || '',
+  //       fromDate: formData.fromDate || '',
+  //       toDate: formData.toDate || '',
+  //       numberOfDays: formData.numberOfDays || '',
+  //       reason: formData.reason || '',
+  //     });
+  //   }
+  // }, [formData]);
 
   return (
     <Box
@@ -75,15 +87,16 @@ const LeaveRecordsEntry = ({ onSave }) => {
               marginBottom: 3,
             }}
           >
-            {initialData ? 'Edit Leave Record' : 'Add Leave Record'}
+            {formData ? 'Edit Leave Record' : 'Add Leave Record'}
           </Typography>
 
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <FormControl fullWidth>
-                  <InputLabel>Leave Type</InputLabel>
+                  <InputLabel id="leave-type-select-label">Leave Type</InputLabel>
                   <Select
+                    labelId="leave-type-select-label"
                     name="leaveType"
                     value={formData.leaveType}
                     onChange={handleChange}
@@ -175,7 +188,7 @@ const LeaveRecordsEntry = ({ onSave }) => {
                     '&:hover': { backgroundColor: '#555555' },
                   }}
                 >
-                  {initialData ? 'Update Record' : 'Save Record'}
+                  {formData ? 'Update Record' : 'Save Record'}
                 </Button>
               </Grid>
             </Grid>

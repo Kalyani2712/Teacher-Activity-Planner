@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Container,
   Typography,
@@ -28,6 +28,7 @@ import 'jspdf-autotable'; // Required for PDF export
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify'; // Notification for success
+import axios from 'axios';
 
 const headers = [
   { label: 'Leave Type', key: 'leaveType' },
@@ -42,9 +43,17 @@ function LeaveRecordsView({ data, onDelete, onEdit }) {
   const navigate = useNavigate();
 
   // States for sorting, search, and filtered data
-  const [sortedData, setSortedData] = useState(data);
+  const [sortedData, setSortedData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/leaves/'+localStorage.getItem('id')).then(res => {
+      setSortedData(res.data)
+    }).catch(error => {
+      console.log(error)
+    })
+  })
 
   // Print functionality
   const handlePrint = useReactToPrint({

@@ -44,6 +44,26 @@ exports.up = async function(knex) {
     table.string('title');
     table.text('module');
   })
+
+  await knex.schema.createTable('leave_records', table => {
+    table.integer('t_id')
+    table.increments('entry_id')
+    table.string('leaveType')
+    table.string('fromDate')
+    table.string('toDate')
+    table.integer('numberOfDays')
+    table.text('reason')
+  })
+
+  await knex.schema.createTable('assigned_lectures', table => {
+    table.integer('t_id')
+    table.increments('entry_id')
+    table.string('className')
+    table.string('courseName')
+    table.string('theoryPeriods')
+    table.string('practicals')
+    table.string('totalPeriods')
+  })
 };
 
 /**
@@ -54,4 +74,6 @@ exports.down = async function(knex) {
   await knex.schema.dropTableIfExists('teachers');
   await knex.schema.dropTableIfExists('teaching_plan');
   await knex.schema.dropTableIfExists('lecture_taken');
+  await knex.schema.dropTableIfExists('leave_records');
+  await knex.schema.dropTableIfExists('assigned_lectures');
 };

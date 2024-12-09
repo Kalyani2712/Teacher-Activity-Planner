@@ -71,4 +71,28 @@ exports.seed = async function(knex) {
       title: "Title 1",
       module: "Module 1"
   }]);
+
+  await knex('leave_records').truncate()
+  await knex('leave_records').insert([
+    {
+      t_id: 1733062607989,
+      leaveType: "Other Leave",
+      fromDate: "2023-01-01",
+      toDate: "2023-01-02",
+      numberOfDays: 2,
+      reason: "Fever",
+    }
+  ]);
+
+  await knex('assigned_lectures').truncate()
+  await knex('assigned_lectures').insert([
+    {
+      t_id: 1733062607989,
+      className: "FY",
+      courseName: "Course 1",
+      theoryPeriods: 7,
+      practicals: 3,
+      totalPeriods: 10,
+    }
+  ]);
 };

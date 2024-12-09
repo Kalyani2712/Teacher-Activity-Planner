@@ -26,28 +26,22 @@ import {
 import { Edit, Delete } from '@mui/icons-material';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import axios from 'axios';
 
 const AssignedLecturesView = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [data, setData] = useState([
-    { id: 1, class: 'First Year', subject: 'Mathematics', periods: 30, year: '2024-2025' },
-    { id: 2, class: 'Second Year', subject: 'Physics', periods: 20, year: '2024-2025' },
+    { id: 1, className: 'First Year', courseName: 'Mathematics', totalPeriods: 30, year: '2024-2025' },
+    { id: 2, className: 'Second Year', courseName: 'Physics', totalPeriods: 20, year: '2024-2025' },
   ]);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Add new lecture if passed via state
   useEffect(() => {
-    if (location.state?.newLecture) {
-      const newEntry = {
-        id: data.length + 1,
-        class: location.state.newLecture.className,
-        subject: location.state.newLecture.courseName,
-        periods: location.state.newLecture.totalPeriods,
-        year: '2024-2025',
-      };
-      setData((prevData) => [...prevData, newEntry]);
-    }
+    axios.get('http://localhost:5000/assignedlectures/'+localStorage.getItem('id')).then((response) => {
+      setData(response.data);
+    })
   }, [location.state, data]);
 
   const handleDelete = (id) => {
@@ -58,8 +52,8 @@ const AssignedLecturesView = () => {
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['Class', 'Subject', 'Periods', 'Year']],
-      body: data.map((item) => [item.class, item.subject, item.periods, item.year]),
+      head: [['className', 'courseName', 'totalPeriods', 'Year']],
+      body: data.map((item) => [item.className, item.courseName, item.totalPeriods, item.year]),
     });
     doc.save('assigned_lectures.pdf');
   };
@@ -67,8 +61,8 @@ const AssignedLecturesView = () => {
   const filteredData = useMemo(() => {
     return data.filter(
       (item) =>
-        item.class.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.subject.toLowerCase().includes(searchTerm.toLowerCase())
+        item.className.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.courseName.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [data, searchTerm]);
 
@@ -96,18 +90,18 @@ const AssignedLecturesView = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Class</TableCell>
-                  <TableCell>Subject</TableCell>
-                  <TableCell>Periods</TableCell>
+                  <TableCell>className</TableCell>
+                  <TableCell>courseName</TableCell>
+                  <TableCell>totalPeriods</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {filteredData.map((item) => (
                   <TableRow key={item.id}>
-                    <TableCell>{item.class}</TableCell>
-                    <TableCell>{item.subject}</TableCell>
-                    <TableCell>{item.periods}</TableCell>
+                    <TableCell>{item.className}</TableCell>
+                    <TableCell>{item.courseName}</TableCell>
+                    <TableCell>{item.totalPeriods}</TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
                         <IconButton

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, TextField, Container, Grid, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const AssignedLectures = () => {
   const [lectureData, setLectureData] = useState({
@@ -40,8 +41,12 @@ const AssignedLectures = () => {
       return;
     }
 
+    axios.post('http://localhost:5000/assignedlectures', lectureData).catch((error) => {
+      console.log(error);
+    });
+
     // Navigate to Assigned Lectures View with the form data
-    navigate('/assigned-lectures-view', { state: { lectureData } });
+    navigate('/assigned-lectures-view');
   };
 
   return (
