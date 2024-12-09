@@ -61,7 +61,7 @@ function App() {
 
 
   const [month, setMonth] = useState('January');
-  const [year, setYear] = useState('2023');
+  const [year, setYear] = useState('2024');
   const [className, setClassName] = useState('FY');
   const [semester, setSemester] = useState('Semester 1');
 

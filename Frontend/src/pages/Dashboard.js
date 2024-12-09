@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Grid, Typography, Box, Card, CardContent, CardActions, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import { Assignment, AccessTime, Group, LibraryBooks, RateReview, Book } from '@mui/icons-material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { BarChart, Bar } from 'recharts';
 import Sidebar from '../components/Sidebar';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 // Sample Data for demonstration
 const initialData = [
@@ -29,12 +30,29 @@ const timetableData = [
 ];
 
 function Dashboard() {
+  const [lectures, setLectures] = useState(0);
+  const [leave, setLeave] = useState(0);
   const [data, setData] = useState(initialData);
   const [selectedYear, setSelectedYear] = useState('FY');
   const [timetable, setTimetable] = useState(timetableData);
   const [newEntry, setNewEntry] = useState({ day: '', time: '', subject: '', year: '' });
   const [editableRow, setEditableRow] = useState(null); // Track the row being edited
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/assignedlectures/'+localStorage.getItem('id')).then((res) => {
+      //total lectures
+      const ldata = res.data.map((item) => parseInt(item.totalPeriods, 10));
+      const totalLectures = ldata.reduce((acc, item) => acc + item, 0);
+      setLectures(totalLectures);
+    })
+    axios.get('http://localhost:5000/leaves/'+localStorage.getItem('id')).then((res) => {
+      //total leaves  
+      const ldata = res.data.map((item) => parseInt(item.numberOfDays, 10));
+      const totalLeaves = ldata.reduce((acc, item) => acc + item, 0);
+      setLeave(totalLeaves);
+    })
+  })
 
   // Handle adding a new timetable entry
   const handleAddTimetable = () => {
@@ -79,13 +97,13 @@ function Dashboard() {
             <Grid container spacing={2} justifyContent="center">
               {/* Assigned Lectures Card */}
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ backgroundColor: '#f1f8e9', boxShadow: 6, borderRadius: '12px', padding: 2 }}>
+                <Card sx={{ backgroundColor: '#f1f8e9', boxShadow: 6, borderRadius: '12px', padding: 2,height: '80%' }}>
                   <CardContent>
                     <Typography variant="h6" sx={{ fontSize: '1.2rem', color: '#3f51b5' }}>Assigned Lectures</Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 1 }}>
                       <Assignment sx={{ fontSize: 50, color: '#3f51b5', marginRight: 2 }} />
                       <Typography variant="h5" sx={{ fontSize: '1.5rem', color: '#3f51b5' }}>
-                        {data.reduce((acc, day) => acc + day.lectures, 0)} Lectures
+                        {lectures} Lectures
                       </Typography>
                     </Box>
                     <CardActions>
@@ -98,7 +116,7 @@ function Dashboard() {
               </Grid>
 
               {/* Teaching Plan Card */}
-              <Grid item xs={12} sm={6} md={3}>
+              {/* <Grid item xs={12} sm={6} md={3}>
                 <Card sx={{ backgroundColor: '#e8f5e9', boxShadow: 6, borderRadius: '12px', padding: 2 }}>
                   <CardContent>
                     <Typography variant="h6" sx={{ fontSize: '1.2rem', color: '#388e3c' }}>Teaching Plan</Typography>
@@ -115,17 +133,17 @@ function Dashboard() {
                     </CardActions>
                   </CardContent>
                 </Card>
-              </Grid>
+              </Grid> */}
 
               {/* Leave Record Card */}
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ backgroundColor: '#fff3e0', boxShadow: 6, borderRadius: '12px', padding: 2 }}>
+                <Card sx={{ backgroundColor: '#fff3e0', boxShadow: 6, borderRadius: '12px', padding: 2 ,height: '80%'}}>
                   <CardContent>
                     <Typography variant="h6" sx={{ fontSize: '1.2rem', color: '#ff5722' }}>Leave Record</Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 1 }}>
                       <AccessTime sx={{ fontSize: 50, color: '#ff5722', marginRight: 2 }} />
                       <Typography variant="h5" sx={{ fontSize: '1.5rem', color: '#ff5722' }}>
-                        {data.reduce((acc, day) => acc + day.leave, 0)} Leaves
+                        {leave} Leaves
                       </Typography>
                     </Box>
                     <CardActions>
@@ -139,7 +157,7 @@ function Dashboard() {
 
               {/* Syllabus Completion Card */}
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ backgroundColor: '#e1bee7', boxShadow: 6, borderRadius: '12px', padding: 2 }}>
+                <Card sx={{ backgroundColor: '#e1bee7', boxShadow: 6, borderRadius: '12px', padding: 2,height: '80%' }}>
                   <CardContent>
                     <Typography variant="h6" sx={{ fontSize: '1.2rem', color: '#8e24aa' }}>Syllabus Completion</Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 1 }}>
