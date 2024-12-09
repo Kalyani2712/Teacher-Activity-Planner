@@ -99,8 +99,10 @@ function LectureData(server, db) {
         try{
             const check = await db('teaching_plan').select().where('t_id', data.t_id).andWhere('year', data.year).andWhere('month', data.month)
             .andWhere('class', data.class).andWhere('semester', data.semester);
+            console.log(check);
             if(check.length > 0 || check === undefined){
-                await db('teaching_plan').where('t_id', data.t_id).update(data);
+                await db('teaching_plan').where('t_id', data.t_id).andWhere('year', data.year).andWhere('month', data.month)
+                .andWhere('class', data.class).andWhere('semester', data.semester).update(data);
             }
             else{await db('teaching_plan').insert(data);} 
             res.sendStatus(200);

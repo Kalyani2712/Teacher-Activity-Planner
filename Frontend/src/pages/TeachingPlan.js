@@ -33,8 +33,7 @@ function TeachingPlanEntry({month, year, className, semester}) {
   });
   const navigate = useNavigate();
   console.log(month, year, className, semester);
-  useState(() => {
-    
+  useState(() => {  
     axios.put('http://localhost:5000/lectures/'+localStorage.getItem('id'), {month: month, year: year, className: className, semester: semester}).then((response) => {
       if (response.data.length !== 0) {
         setFormData(response.data[0]);
@@ -43,7 +42,7 @@ function TeachingPlanEntry({month, year, className, semester}) {
     .catch((error) => {
       console.log(error);
     });
-  }, []);
+  }, [ month, year, className, semester ]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

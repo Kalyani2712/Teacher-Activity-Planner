@@ -29,9 +29,10 @@ const timetableData = [
   { day: 'Friday', time: '10:00 AM - 11:00 AM', subject: 'Music', year: 'FY' },
 ];
 
-function Dashboard() {
+function Dashboard({syllabusData}) {
   const [lectures, setLectures] = useState(0);
   const [leave, setLeave] = useState(0);
+  const [syllabus, setSyllabus] = useState(3);
   const [data, setData] = useState(initialData);
   const [selectedYear, setSelectedYear] = useState('FY');
   const [timetable, setTimetable] = useState(timetableData);
@@ -51,6 +52,12 @@ function Dashboard() {
       const ldata = res.data.map((item) => parseInt(item.numberOfDays, 10));
       const totalLeaves = ldata.reduce((acc, item) => acc + item, 0);
       setLeave(totalLeaves);
+    })
+    console.log(syllabusData);
+    syllabusData.map((item) => {
+      if (item.remark === "completed") {
+        setSyllabus(syllabus + 1);    
+      }
     })
   })
 
@@ -163,7 +170,8 @@ function Dashboard() {
                     <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 1 }}>
                       <RateReview sx={{ fontSize: 50, color: '#8e24aa', marginRight: 2 }} />
                       <Typography variant="h5" sx={{ fontSize: '1.5rem', color: '#8e24aa' }}>
-                        {data.reduce((acc, day) => acc + day.syllabusCompletion, 0)} Completed
+                        {/* {data.reduce((acc, day) => acc + day.syllabusCompletion, 0)} Completed */}
+                        {syllabus} Completed
                       </Typography>
                     </Box>
                     <CardActions>

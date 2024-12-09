@@ -39,7 +39,7 @@ const CommitteeWorkEntry = ({ onSave }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave(formData);
-    navigate('/committees-view'); // Redirect to the view page after saving
+    navigate('/CommitteesView'); // Redirect to the view page after saving
   };
 
   // Load initial data for editing

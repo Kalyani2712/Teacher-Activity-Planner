@@ -41,7 +41,7 @@ const headers = [
   { label: 'Remark', key: 'remark' },
 ];
 
-function SyllabusCompletionView({ data = [], onDelete, onEdit }) {
+function SyllabusCompletionView({ setSyllabusData, data = [], onDelete, onEdit }) {
   const printRef = useRef();
   const navigate = useNavigate();
 
@@ -52,16 +52,17 @@ function SyllabusCompletionView({ data = [], onDelete, onEdit }) {
 
   useEffect(() => {
     axios.get('http://localhost:5000/lectures/'+localStorage.getItem('id')).then((res) => {
-      setSortedData([{
-        className: res.data[0].class,
-        semester: res.data[0].semester,
-        paperNo: res.data[0].paperNo,
-        paperTitle: res.data[0].course,
-        month: res.data[0].month,
-        syllabusPlanned: res.data[0].title,
+      setSortedData(res.data.map((item) => ({
+        className: item.class,
+        semester: item.semester,
+        paperNo: item.paperNo,
+        paperTitle: item.course,
+        month: item.month,
+        syllabusPlanned: item.title,
         syllabusRemained: null,
-        remark: JSON.parse(res.data[0].lectureDetails).filter((lecture) => lecture.remark !== "completed").length > 0 ? "Not Completed" : "Completed"
-      }]);
+        remark: JSON.parse(item.lectureDetails).filter((lecture) => lecture.remark !== "completed").length > 0 ? "Not Completed" : "Completed"
+      })));
+      setSyllabusData(sortedData);
     })
   }, []);
 
@@ -240,13 +241,13 @@ function SyllabusCompletionView({ data = [], onDelete, onEdit }) {
                           >
                             <Edit fontSize="small" />
                           </IconButton>
-                          <IconButton
+                          {/* <IconButton
                             size="small"
                             onClick={() => handleDelete(entry.id)}
                             sx={{ color: '#d32f2f' }}
                           >
                             <Delete fontSize="small" />
-                          </IconButton>
+                          </IconButton> */}
                         </Stack>
                       </TableCell>
                     </TableRow>

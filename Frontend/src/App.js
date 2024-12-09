@@ -64,6 +64,7 @@ function App() {
   const [year, setYear] = useState('2024');
   const [className, setClassName] = useState('FY');
   const [semester, setSemester] = useState('Semester 1');
+  const [syllabusData, setSyllabusData] = useState([]);
 
 
   // State to handle if user is logged in
@@ -182,8 +183,8 @@ function App() {
           <Sidebar />
           <div style={{ marginLeft: 240, paddingTop: 64 }}> {/* Adjust the marginLeft based on sidebar width */}
             <Routes>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard syllabusData={syllabusData}/>} />
+              <Route path="/" element={<Dashboard syllabusData={syllabusData}/>} />
               <Route path="/Profile" element={<Profile/>} />
               {/* Assigned Lectures */}
               <Route path="/assigned-lectures-view" element={<AssignedLecturesView />} />
@@ -244,7 +245,7 @@ function App() {
               <Route path="/LectureDetails" element={<LectureDetails entry_id={entry_id} month={month} year={year} className={className}/>}/>
               <Route path="/LectureDetailsView" element={<LectureDetailsView entry_id={entry_id} setEntry_id={setEntry_id}/>} />
               <Route path="/SyllabusReport" element={<SyllabusReport />} />
-              <Route path="/SyllabusCompletionView" element={<SyllabusCompletionView />} />
+              <Route path="/SyllabusCompletionView" element={<SyllabusCompletionView setSyllabusData={setSyllabusData} />} />
               <Route path="/SyllabusReport" element={<SyllabusReport />} />
               <Route path="/SynopsisView" element={<SynopsisView />} />
               <Route path="/Synopsis" element={<Synopsis />} />
